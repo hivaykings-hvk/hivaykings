@@ -1,0 +1,97 @@
+'use client';
+
+import { useInfiniteQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import { useEffect, useRef } from 'react';
+import AskHvkCard from './ask-hvk-card';
+import LoadingSpinner from './spinner';
+
+const QUESTIONS_PER_PAGE = 1; //parseInt(process.env.NEXT_PUBLIC_QUESTIONS_PER_PAGE || '1', 1);
+
+const QuestionsList = () => {
+    const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } = useInfiniteQuery({
+        queryKey: ['questions'],
+        queryFn: async ({ pageParam = 1 }) => {
+            const response = await axios.get('/api/questions', {
+                params: {
+                    page: pageParam,
+                    limit: QUESTIONS_PER_PAGE,
+                },
+            });
+            console.log('Full response:', response);
+            console.log('Response data:', response.data);
+            const questions = response.data.data;
+            console.log('Questions extracted:', questions);
+            console.log('Questions count:', questions.length);
+            return { questions, nextPage: pageParam + 1 };
+        },
+        initialPageParam: 1,
+        getNextPageParam: (lastPage) => {
+            // If the number of returned questions is less than QUESTIONS_PER_PAGE, it's the last page
+            if (lastPage.questions.length < QUESTIONS_PER_PAGE) {
+                return undefined;
+            }
+            return lastPage.nextPage;
+        },
+        staleTime: 1000 * 60 * 5, // 5 minutes
+        gcTime: 1000 * 60 * 10, // 10 minutes
+    });
+
+    const observerTarget = useRef(null);
+
+    useEffect(() => {
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+                    fetchNextPage();
+                }
+            },
+            { threshold: 1 },
+        );
+
+        if (observerTarget.current) {
+            observer.observe(observerTarget.current);
+        }
+
+        return () => {
+            if (observerTarget.current) {
+                observer.unobserve(observerTarget.current);
+            }
+        };
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+    if (isLoading) {
+        return <LoadingSpinner />;
+    }
+
+    if (isError) {
+        return <div className="m-4 text-sm text-red-500">Error: {error?.message}</div>;
+    }
+
+    const allQuestions = (data?.pages ?? []).flatMap((page) => page.questions ?? []);
+
+    console.log('Data object:', data);
+    console.log('Data pages:', data?.pages);
+    console.log('All questions flattened:', allQuestions);
+    console.log('All questions length:', allQuestions.length);
+
+    return (
+        <>
+            {allQuestions.map((question) => (
+                <AskHvkCard
+                    key={question.id}
+                    question={question}
+                    stats={{ views: 156, replies: 12 }} // Dummy stats for now, can be fetched later
+                />
+            ))}
+            <div ref={observerTarget} className="h-1" /> {/* Invisible target for observer */}
+            {isFetchingNextPage && <LoadingSpinner />}
+            {!hasNextPage && allQuestions.length > 0 && <div className="m-4 text-center text-xl text-gray-500">No more questions</div>}
+            {allQuestions.length === 0 && !isLoading && (
+                <div className="m-4 text-center text-lg text-gray-500">No questions available yet. Be the first to create one!</div>
+            )}
+        </>
+    );
+};
+
+export default QuestionsList;
