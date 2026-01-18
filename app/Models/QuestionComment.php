@@ -16,6 +16,7 @@ class QuestionComment extends Model
     protected $fillable = [
         'question_id',
         'user_id',
+        'parent_id',
         'content',
         'likes_count',
     ];
@@ -38,6 +39,16 @@ class QuestionComment extends Model
     public function likes(): HasMany
     {
         return $this->hasMany(CommentLike::class, 'comment_id');
+    }
+
+    public function parent(): BelongsTo
+    {
+        return $this->belongsTo(QuestionComment::class, 'parent_id');
+    }
+
+    public function children(): HasMany
+    {
+        return $this->hasMany(QuestionComment::class, 'parent_id');
     }
 
     public function isLikedBy(User $user): bool

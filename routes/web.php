@@ -5,8 +5,9 @@ use Inertia\Inertia;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\QuestionsController;
-use App\Http\Controllers\QuestionCommentsController;
+use App\Http\Controllers\QuestionCommentController;
 use App\Http\Controllers\PollsController;
+use App\Http\Controllers\QuestionDetailController;
 use Illuminate\Http\Request;
 
 Route::get('/', function () {
@@ -75,16 +76,29 @@ Route::get('/hvk-chowk', function (Request $request) {
     ]);
 })->name('hvk-chowk');
 
+Route::get('/hvk-chowk/question/{id}', [QuestionDetailController::class, 'show'])->name('question.show');
+
 // Questions API Routes
 Route::get('/api/questions', [QuestionsController::class, 'index']);
 Route::post('/api/questions', [QuestionsController::class, 'store']);
 Route::get('/api/questions/{id}', [QuestionsController::class, 'show']);
 Route::post('/api/questions/{id}/like', [QuestionsController::class, 'like']);
 
+// Question Replies API Routes
+Route::get('/api/questions/{questionId}/replies', [QuestionCommentController::class, 'getReplies']);
+Route::get('/api/replies/{parentId}/children', [QuestionCommentController::class, 'getChildReplies']);
+Route::get('/api/replies/{parentId}/child-count', [QuestionCommentController::class, 'getChildCount']);
+
+// Protected reply submission routes (require authentication)
+Route::middleware('auth')->group(function () {
+    Route::post('/api/replies', [QuestionCommentController::class, 'store']);
+    Route::post('/api/replies/{parentId}/child', [QuestionCommentController::class, 'storeChild']);
+});
+
 // Question Comments API Routes
-Route::get('/api/questions/{questionId}/comments', [QuestionCommentsController::class, 'index']);
-Route::post('/api/questions/{questionId}/comments', [QuestionCommentsController::class, 'store']);
-Route::post('/api/comments/{commentId}/like', [QuestionCommentsController::class, 'like']);
+Route::get('/api/questions/{questionId}/comments', [QuestionCommentController::class, 'index']);
+Route::post('/api/questions/{questionId}/comments', [QuestionCommentController::class, 'store']);
+Route::post('/api/comments/{commentId}/like', [QuestionCommentController::class, 'like']);
 
 // Polls API Routes
 Route::get('/api/polls', [PollsController::class, 'index']);
