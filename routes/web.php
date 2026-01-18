@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\QuestionsController;
 use App\Http\Controllers\QuestionCommentController;
 use App\Http\Controllers\PollsController;
+use App\Http\Controllers\RoadRatingController;
 use App\Http\Controllers\QuestionDetailController;
 use Illuminate\Http\Request;
 
@@ -78,6 +79,21 @@ Route::get('/hvk-chowk', function (Request $request) {
 
 Route::get('/hvk-chowk/question/{id}', [QuestionDetailController::class, 'show'])->name('question.show');
 
+// Road Ratings Routes
+Route::get('/road-ratings', function () {
+    return Inertia::render('RoadRatings');
+})->name('road-ratings');
+
+Route::get('/road-ratings/create', function () {
+    return Inertia::render('CreateRoadRating');
+})->name('road-ratings.create');
+
+Route::get('/road-ratings/{id}', function ($id) {
+    return Inertia::render('RoadRatingDetail', [
+        'id' => $id,
+    ]);
+})->name('road-ratings.show');
+
 // Questions API Routes
 Route::get('/api/questions', [QuestionsController::class, 'index']);
 Route::post('/api/questions', [QuestionsController::class, 'store']);
@@ -104,5 +120,12 @@ Route::post('/api/comments/{commentId}/like', [QuestionCommentController::class,
 Route::get('/api/polls', [PollsController::class, 'index']);
 Route::post('/api/polls', [PollsController::class, 'store']);
 Route::post('/api/poll-options/{pollOptionId}/vote', [PollsController::class, 'vote']);
+
+// Road Ratings API Routes
+Route::get('/api/road-ratings', [RoadRatingController::class, 'index']);
+Route::get('/api/road-ratings/{id}', [RoadRatingController::class, 'show']);
+Route::post('/api/road-ratings', [RoadRatingController::class, 'store']);
+Route::post('/api/road-ratings/{roadRatingId}/user-rating', [RoadRatingController::class, 'storeUserRating']);
+Route::post('/api/road-ratings/{roadRatingId}/comments', [RoadRatingController::class, 'storeComment']);
 
 Route::middleware('auth')->post('/api/logout', [LoginController::class, 'logout']);
