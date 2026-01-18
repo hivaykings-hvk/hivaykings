@@ -44,24 +44,25 @@ class PollsController extends Controller
                 'question_text' => $poll->question_text,
                 'description' => $poll->description,
                 'hashtags' => $poll->hashtags ? explode(',', $poll->hashtags) : [],
-                'expires_at' => $poll->expires_at,
+                'expiresAt' => $poll->expires_at,
                 'total_votes' => $poll->total_votes,
                 'user' => [
                     'id' => $poll->user->id,
-                    'name' => $poll->user->first_name . ' ' . $poll->user->last_name,
+                    'firstName' => $poll->user->first_name,
+                    'lastName' => $poll->user->last_name,
                     'email' => $poll->user->email,
                     'avatar_url' => $poll->user->image_path,
                 ],
                 'options' => $poll->options->map(function ($option) use ($userVotedOptionIds) {
                     return [
                         'id' => $option->id,
-                        'option_text' => $option->option_text,
+                        'optionText' => $option->option_text,
                         'votes' => $option->votes,
                         'user_voted' => in_array($option->id, $userVotedOptionIds),
                     ];
                 })->toArray(),
-                'created_at' => $poll->created_at,
-                'updated_at' => $poll->updated_at,
+                'createdAt' => $poll->created_at,
+                'updatedAt' => $poll->updated_at,
             ];
         })->toArray();
 
@@ -114,7 +115,8 @@ class PollsController extends Controller
             'total_votes' => 0,
             'user' => [
                 'id' => $poll->user->id,
-                'name' => $poll->user->first_name . ' ' . $poll->user->last_name,
+                'firstName' => $poll->user->first_name,
+                'lastName' => $poll->user->last_name,
                 'email' => $poll->user->email,
                 'avatar_url' => $poll->user->image_path,
             ],
@@ -126,8 +128,8 @@ class PollsController extends Controller
                     'user_voted' => false,
                 ];
             })->toArray(),
-            'created_at' => $poll->created_at,
-            'updated_at' => $poll->updated_at,
+            'createdAt' => $poll->created_at,
+            'updatedAt' => $poll->updated_at,
         ], 201);
     }
 

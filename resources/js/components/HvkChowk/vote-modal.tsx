@@ -37,7 +37,7 @@ const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose, pollId, pollQues
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
-            const response = await fetch(`/api/polls/${pollId}/vote`, {
+            const response = await fetch(`/api/poll-options/${selectedOption}/vote`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ const VoteModal: React.FC<VoteModalProps> = ({ isOpen, onClose, pollId, pollQues
                     'X-Requested-With': 'XMLHttpRequest',
                 },
                 credentials: 'include',
-                body: JSON.stringify({ optionId: selectedOption }),
+                body: JSON.stringify({}),
             });
 
             if (response.ok) {

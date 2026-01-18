@@ -92,7 +92,7 @@ const PollCard: React.FC<PollCardProps> = ({ poll, options, totalVotes, onVoteSu
                         ) : (
                             <div className="rounded-full bg-gray-400 px-3 py-1 text-xs font-medium text-white">Ended</div>
                         )}
-                        <div className="text-sm text-gray-500">Closes {timeUntil(new Date(poll.expiresAt))}</div>
+                        <div className="text-sm text-gray-500">Closes {timeUntil(poll.expiresAt)}</div>
                     </div>
 
                     {/* Poll Question */}
@@ -138,7 +138,7 @@ const PollCard: React.FC<PollCardProps> = ({ poll, options, totalVotes, onVoteSu
                     <div className="flex items-center justify-between rounded-md bg-purple-50 p-2">
                         <div className="text-sm text-purple-800">Total Votes : {totalVotes}</div>
                         <div className="inline-flex items-center gap-1 text-sm text-purple-800">
-                            <FaClock /> Closes {timeUntil(new Date(poll.expiresAt))}
+                            <FaClock /> Closes {timeUntil(poll.expiresAt)}
                         </div>
                     </div>
 
@@ -155,7 +155,7 @@ const PollCard: React.FC<PollCardProps> = ({ poll, options, totalVotes, onVoteSu
                                     {poll.user.title}
                                 </span>
                             )}
-                            <span className="text-sm text-gray-500">{timeAgo(new Date(poll.createdAt))}</span>
+                            <span className="text-sm text-gray-500">{timeAgo(poll.createdAt)}</span>
                         </div>
                     </div>
 

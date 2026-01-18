@@ -19,6 +19,7 @@ interface PollOption {
     id: string;
     optionText: string;
     votes: number;
+    user_voted?: boolean;
 }
 
 interface Poll {
@@ -56,7 +57,11 @@ const PollsList: React.FC<PollsListProps> = ({ user }) => {
                     limit: POLLS_PER_PAGE,
                 },
             });
+            console.log('Full poll response:', response);
+            console.log('Poll response data:', response.data);
             const polls = response.data.data;
+            console.log('Polls extracted:', polls);
+            console.log('Polls count:', polls.length);
             return { polls, nextPage: pageParam + 1 };
         },
         initialPageParam: 1,
@@ -107,21 +112,25 @@ const PollsList: React.FC<PollsListProps> = ({ user }) => {
         return <div className="m-4 text-sm text-red-500">Error: {error?.message}</div>;
     }
 
-    const allPolls = data?.pages.flatMap((page) => page.polls || []) || [];
+    const allPolls = (data?.pages ?? []).flatMap((page) => page.polls ?? []);
+
+    console.log('Data object:', data);
+    console.log('Data pages:', data?.pages);
+    console.log('All polls flattened:', allPolls);
+    console.log('All polls length:', allPolls.length);
 
     return (
         <>
-            {allPolls &&
-                allPolls.map((poll: Poll) => (
-                    <PollCard
-                        key={poll.id}
-                        poll={poll}
-                        options={poll.options}
-                        totalVotes={poll.totalVotes}
-                        onVoteSuccess={handleVoteSuccess}
-                        user={user}
-                    />
-                ))}
+            {allPolls.map((poll: Poll) => (
+                <PollCard
+                    key={poll.id}
+                    poll={poll}
+                    options={poll.options}
+                    totalVotes={poll.totalVotes}
+                    onVoteSuccess={handleVoteSuccess}
+                    user={user}
+                />
+            ))}
             <div ref={observerTarget} className="h-1" /> {/* Invisible target for observer */}
             {isFetchingNextPage && <LoadingSpinner />}
             {!hasNextPage && allPolls.length > 0 && <div className="m-4 text-center text-xl text-gray-500">No more polls</div>}

@@ -21,7 +21,9 @@ export const timeAgo = (dateString: string): string => {
 };
 
 export const timeUntil = (dateString: string): string => {
+    console.log('Calculating time until for date string:', dateString);
     const date = new Date(dateString);
+    console.log('Calculating time until for date:', date);
     const now = new Date();
     const seconds = Math.floor((date.getTime() - now.getTime()) / 1000);
 

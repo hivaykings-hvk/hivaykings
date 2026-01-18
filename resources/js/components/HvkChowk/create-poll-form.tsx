@@ -93,7 +93,7 @@ export function CreatePollForm({ user }: CreatePollFormProps) {
     };
 
     const createPollMutation = useMutation({
-        mutationFn: async (data: CreatePollFormSchemaType) => {
+        mutationFn: async (data: any) => {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
 
             const response = await fetch('/api/polls', {
@@ -143,7 +143,32 @@ export function CreatePollForm({ user }: CreatePollFormProps) {
     });
 
     const onSubmit = async (data: CreatePollFormSchemaType) => {
-        createPollMutation.mutate(data);
+        // Transform frontend data to backend format
+        const getDurationDate = (duration: string): string => {
+            const now = new Date();
+            switch (duration) {
+                case '1_day':
+                    now.setDate(now.getDate() + 1);
+                    break;
+                case '3_days':
+                    now.setDate(now.getDate() + 3);
+                    break;
+                case '7_days':
+                    now.setDate(now.getDate() + 7);
+                    break;
+            }
+            return now.toISOString();
+        };
+
+        const transformedData = {
+            question_text: data.pollQuestion,
+            options: data.pollOptions.map((opt) => opt.value),
+            expires_at: getDurationDate(data.pollDuration),
+            hashtags: data.tags ? data.tags.split(' ').filter((tag) => tag.length > 0) : [],
+            description: data.description || null,
+        };
+
+        createPollMutation.mutate(transformedData as any);
     };
 
     return (
