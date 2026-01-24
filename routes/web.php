@@ -9,6 +9,7 @@ use App\Http\Controllers\QuestionCommentController;
 use App\Http\Controllers\PollsController;
 use App\Http\Controllers\RoadRatingController;
 use App\Http\Controllers\QuestionDetailController;
+use App\Http\Controllers\TravelogueController;
 use Illuminate\Http\Request;
 
 Route::get('/', function () {
@@ -94,6 +95,21 @@ Route::get('/road-ratings/{id}', function ($id) {
     ]);
 })->name('road-ratings.show');
 
+// Travelogue Routes
+Route::get('/travelogue', function () {
+    return Inertia::render('Travelogue');
+})->name('travelogue');
+
+Route::get('/travelogue/create', function () {
+    return Inertia::render('CreateTravelogue');
+})->name('travelogue.create');
+
+Route::get('/travelogue/{id}', function ($id) {
+    return Inertia::render('TravelogueDetail', [
+        'id' => $id,
+    ]);
+})->name('travelogue.show');
+
 // Questions API Routes
 Route::get('/api/questions', [QuestionsController::class, 'index']);
 Route::post('/api/questions', [QuestionsController::class, 'store']);
@@ -127,5 +143,17 @@ Route::get('/api/road-ratings/{id}', [RoadRatingController::class, 'show']);
 Route::post('/api/road-ratings', [RoadRatingController::class, 'store']);
 Route::post('/api/road-ratings/{roadRatingId}/user-rating', [RoadRatingController::class, 'storeUserRating']);
 Route::post('/api/road-ratings/{roadRatingId}/comments', [RoadRatingController::class, 'storeComment']);
+
+// Travelogue API Routes
+Route::get('/api/travelogues', [TravelogueController::class, 'index']);
+Route::get('/api/travelogues/{id}', [TravelogueController::class, 'show']);
+
+// Protected travelogue routes (require authentication)
+Route::middleware('auth')->group(function () {
+    Route::post('/api/travelogues', [TravelogueController::class, 'store']);
+    Route::put('/api/travelogues/{travelogue}', [TravelogueController::class, 'update']);
+    Route::delete('/api/travelogues/{travelogue}', [TravelogueController::class, 'destroy']);
+    Route::get('/api/user/travelogues', [TravelogueController::class, 'userTravelogues']);
+});
 
 Route::middleware('auth')->post('/api/logout', [LoginController::class, 'logout']);

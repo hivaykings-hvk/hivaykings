@@ -5,10 +5,22 @@ import { FaCamera, FaTimes } from 'react-icons/fa';
 
 interface ImagePickerWithPreviewProps {
     onImageSelected: (base64: string) => void;
+    onValueChange?: (base64: string) => void;
+    value?: string;
+    previewText?: string;
+    buttonText?: string;
+    width?: number;
+    height?: number;
 }
 
-export default function ImagePickerWithPreview({ onImageSelected }: ImagePickerWithPreviewProps) {
-    const [preview, setPreview] = useState<string | null>(null);
+export default function ImagePickerWithPreview({
+    onImageSelected,
+    onValueChange,
+    value,
+    previewText = 'Preview',
+    buttonText = 'Choose Image',
+}: ImagePickerWithPreviewProps) {
+    const [preview, setPreview] = useState<string | null>(value || null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -19,6 +31,7 @@ export default function ImagePickerWithPreview({ onImageSelected }: ImagePickerW
                 const base64String = reader.result as string;
                 setPreview(base64String);
                 onImageSelected(base64String);
+                onValueChange?.(base64String);
             };
             reader.readAsDataURL(file);
         }
@@ -29,13 +42,15 @@ export default function ImagePickerWithPreview({ onImageSelected }: ImagePickerW
         if (fileInputRef.current) {
             fileInputRef.current.value = '';
         }
+        onImageSelected('');
+        onValueChange?.('');
     };
 
     return (
         <div>
             {preview ? (
                 <div className="relative">
-                    <img src={preview} alt="Preview" className="h-64 w-full rounded-lg object-cover" />
+                    <img src={preview} alt={previewText} className="h-64 w-full rounded-lg object-cover" />
                     <button
                         type="button"
                         onClick={handleRemoveImage}
