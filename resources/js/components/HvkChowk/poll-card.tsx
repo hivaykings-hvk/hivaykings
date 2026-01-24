@@ -1,10 +1,10 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { timeAgo, timeUntil } from '@/lib/time-functions';
 import { titleColorMap } from '@/lib/title-color-map';
 import React, { useState } from 'react';
 import { FaRegComment, FaRegHeart } from 'react-icons/fa';
 import { FaClock } from 'react-icons/fa6';
 import { toast } from 'sonner';
+import UserAvatar from '../UserAvatar';
 import VoteModal from './vote-modal';
 
 interface PollOption {
@@ -75,13 +75,10 @@ const PollCard: React.FC<PollCardProps> = ({ poll, options, totalVotes, onVoteSu
     };
 
     return (
-        <div className="mx-6 my-auto rounded-lg border-l-4 border-purple-500 bg-white p-6 shadow-lg">
+        <div className="m-6 mx-auto rounded-lg border-l-4 border-purple-500 bg-white p-6 shadow-lg">
             <div className="mb-4 flex space-x-3">
                 <div className="min-w-12 grow-0">
-                    <Avatar className="bg-gray-100">
-                        <AvatarImage src={`${process.env.NEXT_PUBLIC_OCI_BUCKET_BASE_URL}/${userImage}`} className="object-cover" />
-                        <AvatarFallback className="text-gray-800">{`${poll?.user?.firstName[0]}${poll?.user?.lastName[0]}`}</AvatarFallback>
-                    </Avatar>
+                    <UserAvatar imageUrl={userImage} firstName={poll?.user?.firstName} lastName={poll?.user?.lastName} />
                 </div>
                 <div className="flex grow-1 flex-col">
                     {/* Header with status badge and category */}

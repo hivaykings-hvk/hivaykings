@@ -1,8 +1,8 @@
 'use client';
 
 import RichTextEditor from '@/Components/RichTextEditor';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
+import UserAvatar from '@/Components/UserAvatar';
 import { User } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
@@ -208,10 +208,7 @@ export default function ReplyForm({ questionId, user, parentId, onSubmitSuccess 
         <div id="share-your-reply" className="mt-8 rounded-lg bg-white p-6 shadow-xl">
             <h2 className="text-md mb-4 font-medium text-gray-800">Share your reply</h2>
             <div className="mb-4 flex w-full flex-col items-start gap-4 sm:flex-row">
-                <Avatar className="h-10 w-10">
-                    <AvatarImage src={`${OCI_BUCKET_BASE_URL}/${user?.image}`} className="object-cover" />
-                    <AvatarFallback>{`${user?.firstName?.[0]}${user?.lastName?.[0]}`}</AvatarFallback>
-                </Avatar>
+                <UserAvatar imageUrl={user?.image_path} firstName={user?.first_name} lastName={user?.last_name} />
                 <div className="flex w-full flex-1 flex-col">
                     <Form {...replyForm}>
                         <form onSubmit={replyForm.handleSubmit(handleSubmit)} className="w-full">

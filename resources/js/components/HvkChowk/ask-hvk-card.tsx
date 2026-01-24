@@ -1,4 +1,3 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
 import { Question as BaseQuestion } from '@/entity/question.entity'; // Rename original Question
 import { timeAgo } from '@/lib/time-functions';
 import { titleColorMap } from '@/lib/title-color-map';
@@ -6,6 +5,7 @@ import parse, { DOMNode, Element, Text } from 'html-react-parser';
 import React from 'react';
 import { FaRegComment, FaRegHeart } from 'react-icons/fa';
 import ShareButton from '../share-button';
+import UserAvatar from '../UserAvatar';
 
 // Define a minimal User interface for the AskHVKCard, matching the API response
 interface UserForCard {
@@ -85,20 +85,15 @@ const AskHVKCard: React.FC<AskHVKCardProps> = ({ question, stats }) => {
     };
 
     return (
-        <div className="mx-6 my-auto rounded-lg border-l-4 border-blue-500 bg-white p-4 shadow-lg">
+        <div className="m-6 mx-auto rounded-lg border-l-4 border-blue-500 bg-white p-4 shadow-lg">
             <div className="mb-4 flex space-x-3">
                 <div className="min-w-12 grow-0">
-                    <Avatar className="bg-gray-100">
-                        <AvatarImage src={`${process.env.NEXT_PUBLIC_OCI_BUCKET_BASE_URL}/${userImage}`} className="object-cover" />
-                        <AvatarFallback className="text-gray-800">{`${question?.user?.firstName[0]}${question?.user?.lastName[0]}`}</AvatarFallback>
-                    </Avatar>
+                    <UserAvatar imageUrl={userImage} firstName={question?.user?.firstName} lastName={question?.user?.lastName} />
                 </div>
 
                 <div className="flex flex-col">
                     <div className="mb-2 flex items-center space-x-2">
-                        {question.category && (
-                            <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">{question.category}</span>
-                        )}
+                        <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Ask Hvk</span>
                         {fromToLocation && <span className="text-sm text-gray-600">{fromToLocation}</span>}
                     </div>
                     <a href={`/hvk-chowk/question/${question.id}`} className="text-xl font-semibold text-gray-900 hover:underline">

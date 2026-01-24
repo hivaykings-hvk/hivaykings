@@ -3,6 +3,8 @@ import RepliesContainer from '@/Components/HvkChowk/question-details/replies-con
 import ReplyForm from '@/Components/HvkChowk/question-details/reply-form';
 import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserAvatar from '@/Components/UserAvatar';
+import RootLayout from '@/Layouts/RootLayout';
 import { timeAgo } from '@/lib/time-functions';
 import { titleColorMap } from '@/lib/title-color-map';
 import { User } from '@/types';
@@ -40,7 +42,7 @@ interface QuestionDetailsProps {
     };
 }
 
-export default function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
+function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
     const { auth } = usePage().props;
     const user = (auth as any)?.user || null;
     const [fullUrl, setFullUrl] = useState('');
@@ -93,11 +95,7 @@ export default function QuestionDetails({ question, totalReplies }: QuestionDeta
                                     {/* Top section: Tags and Action Icons */}
                                     <div className="mb-4 flex items-center justify-between">
                                         <div className="flex gap-2">
-                                            {question?.category && (
-                                                <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">
-                                                    {question?.category}
-                                                </span>
-                                            )}
+                                            <span className="rounded-full bg-blue-100 px-2.5 py-0.5 text-xs font-medium text-blue-800">Ask Hvk</span>
                                             <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-800">
                                                 {question?.fromCity} {' → '} {question?.toCity}
                                             </span>
@@ -139,11 +137,7 @@ export default function QuestionDetails({ question, totalReplies }: QuestionDeta
                                     {/* Header */}
                                     <div className="mb-4 flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <Avatar className="h-12 w-12">
-                                                <AvatarImage src={`${OCI_BUCKET_BASE_URL}/${question.user?.image}`} className="object-cover" />
-                                                <AvatarFallback>{`${question.user?.firstName?.[0] || '?'}${question.user?.lastName?.[0] || '?'}`}</AvatarFallback>
-                                            </Avatar>
-
+                                            <UserAvatar imageUrl={question.user?.image} firstName={question.user?.firstName} lastName={question.user?.lastName} />
                                             <div>
                                                 <div className="font-semibold text-gray-800">
                                                     {question.user?.firstName} {question.user?.lastName}
@@ -229,3 +223,9 @@ export default function QuestionDetails({ question, totalReplies }: QuestionDeta
         </ReactQueryProvider>
     );
 }
+
+QuestionDetails.layout = function (page: React.ReactNode) {
+    return <RootLayout>{page}</RootLayout>;
+};
+
+export default QuestionDetails;

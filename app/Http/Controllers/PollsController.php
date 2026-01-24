@@ -41,17 +41,18 @@ class PollsController extends Controller
 
             return [
                 'id' => $poll->id,
-                'question_text' => $poll->question_text,
+                'questionText' => $poll->question_text,
                 'description' => $poll->description,
                 'hashtags' => $poll->hashtags ? explode(',', $poll->hashtags) : [],
                 'expiresAt' => $poll->expires_at,
-                'total_votes' => $poll->total_votes,
+                'totalVotes' => $poll->total_votes,
                 'user' => [
                     'id' => $poll->user->id,
                     'firstName' => $poll->user->first_name,
                     'lastName' => $poll->user->last_name,
                     'email' => $poll->user->email,
-                    'avatar_url' => $poll->user->image_path,
+                    'title' => $poll->user->title,
+                    'image' => $poll->user->image_path,
                 ],
                 'options' => $poll->options->map(function ($option) use ($userVotedOptionIds) {
                     return [
@@ -108,17 +109,18 @@ class PollsController extends Controller
 
         return response()->json([
             'id' => $poll->id,
-            'question_text' => $poll->question_text,
+            'questionText' => $poll->question_text,
             'description' => $poll->description,
             'hashtags' => $poll->hashtags ? explode(',', $poll->hashtags) : [],
-            'expires_at' => $poll->expires_at,
-            'total_votes' => 0,
+            'expiresAt' => $poll->expires_at,
+            'totalVotes' => 0,
             'user' => [
                 'id' => $poll->user->id,
                 'firstName' => $poll->user->first_name,
                 'lastName' => $poll->user->last_name,
                 'email' => $poll->user->email,
-                'avatar_url' => $poll->user->image_path,
+                'title' => $poll->user->title,
+                'image' => $poll->user->image_path,
             ],
             'options' => $poll->options->map(function ($option) {
                 return [

@@ -46,18 +46,19 @@ class QuestionsController extends Controller
                 'toCity' => $question->to_city,
                 'hashtags' => $question->hashtags,
                 'views' => $question->views,
-                'likes_count' => $question->likes_count,
-                'comments_count' => $question->comments_count,
+                'likesCount' => $question->likes_count,
+                'commentsCount' => $question->comments_count,
                 'user' => [
                     'id' => $question->user->id,
                     'firstName' => $question->user->first_name,
                     'lastName' => $question->user->last_name,
                     'email' => $question->user->email,
+                    'title' => $question->user->title,
                     'image' => $question->user->image_path,
                 ],
-                'is_liked' => $isLiked,
-                'created_at' => $question->created_at,
-                'updated_at' => $question->updated_at,
+                'isLiked' => $isLiked,
+                'createdAt' => $question->created_at,
+                'updatedAt' => $question->updated_at,
             ];
         })->toArray();
 
@@ -95,21 +96,23 @@ class QuestionsController extends Controller
             'id' => $question->id,
             'subject' => $question->subject,
             'description' => $question->description,
-            'from_city' => $question->from_city,
-            'to_city' => $question->to_city,
+            'fromCity' => $question->from_city,
+            'toCity' => $question->to_city,
             'hashtags' => $question->hashtags,
             'views' => $question->views,
-            'likes_count' => 0,
-            'comments_count' => 0,
+            'likesCount' => 0,
+            'commentsCount' => 0,
             'user' => [
                 'id' => $question->user->id,
-                'name' => $question->user->first_name . ' ' . $question->user->last_name,
+                'firstName' => $question->user->first_name,
+                'lastName' => $question->user->last_name,
                 'email' => $question->user->email,
-                'avatar_url' => $question->user->image_path,
+                'title' => $question->user->title,
+                'image' => $question->user->image_path,
             ],
-            'is_liked' => false,
-            'created_at' => $question->created_at,
-            'updated_at' => $question->updated_at,
+            'isLiked' => false,
+            'createdAt' => $question->created_at,
+            'updatedAt' => $question->updated_at,
         ], 201);
     }
 
@@ -132,21 +135,23 @@ class QuestionsController extends Controller
             'id' => $question->id,
             'subject' => $question->subject,
             'description' => $question->description,
-            'from_city' => $question->from_city,
-            'to_city' => $question->to_city,
+            'fromCity' => $question->from_city,
+            'toCity' => $question->to_city,
             'hashtags' => $question->hashtags,
             'views' => $question->views,
-            'likes_count' => $question->likes_count,
-            'comments_count' => $question->comments_count,
+            'likesCount' => $question->likes_count,
+            'commentsCount' => $question->comments_count,
             'user' => [
                 'id' => $question->user->id,
-                'name' => $question->user->first_name . ' ' . $question->user->last_name,
+                'firstName' => $question->user->first_name,
+                'lastName' => $question->user->last_name,
                 'email' => $question->user->email,
-                'avatar_url' => $question->user->image_path,
+                'title' => $question->user->title,
+                'image' => $question->user->image_path,
             ],
-            'is_liked' => $isLiked,
-            'created_at' => $question->created_at,
-            'updated_at' => $question->updated_at,
+            'isLiked' => $isLiked,
+            'createdAt' => $question->created_at,
+            'updatedAt' => $question->updated_at,
         ]);
     }
 
@@ -166,9 +171,9 @@ class QuestionsController extends Controller
             $like->delete();
             $question->decrement('likes_count');
             return response()->json([
-                'question_id' => $id,
-                'is_liked' => false,
-                'likes_count' => $question->likes_count,
+                'questionId' => $id,
+                'isLiked' => false,
+                'likesCount' => $question->likes_count,
             ]);
         } else {
             QuestionLike::create([
@@ -177,9 +182,9 @@ class QuestionsController extends Controller
             ]);
             $question->increment('likes_count');
             return response()->json([
-                'question_id' => $id,
-                'is_liked' => true,
-                'likes_count' => $question->likes_count,
+                'questionId' => $id,
+                'isLiked' => true,
+                'likesCount' => $question->likes_count,
             ]);
         }
     }

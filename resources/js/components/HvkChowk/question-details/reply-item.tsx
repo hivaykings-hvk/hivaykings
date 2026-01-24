@@ -1,7 +1,7 @@
 'use client';
 
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
+import UserAvatar from '@/Components/UserAvatar';
 import { timeAgo } from '@/lib/time-functions';
 import { titleColorMap } from '@/lib/title-color-map';
 import { User } from '@/types';
@@ -118,11 +118,7 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
                     )}
                     <div className="mb-4 flex items-center justify-between">
                         <div className="flex items-center gap-3">
-                            <Avatar className="h-12 w-12">
-                                <AvatarImage src={`${OCI_BUCKET_BASE_URL}/${reply.user.image}`} className="object-cover" />
-                                <AvatarFallback>{`${reply.user.firstName[0]}${reply.user.lastName[0]}`}</AvatarFallback>
-                            </Avatar>
-
+                            <UserAvatar imageUrl={reply.user.image} firstName={reply.user.firstName} lastName={reply.user.lastName} />
                             <div>
                                 <div className="font-semibold text-gray-800">
                                     {reply.user.firstName} {reply.user.lastName}
@@ -189,10 +185,7 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
         } else {
             return (
                 <div className="flex items-start space-x-4 rounded-lg bg-white p-6 shadow-xl">
-                    <Avatar className="h-10 w-10">
-                        <AvatarImage src={`${OCI_BUCKET_BASE_URL}/${reply.user.image}`} />
-                        <AvatarFallback>{`${reply.user.firstName[0]}${reply.user.lastName[0]}`}</AvatarFallback>
-                    </Avatar>
+                    <UserAvatar imageUrl={reply.user.image} firstName={reply.user.firstName} lastName={reply.user.lastName} />
                     <div className="flex-grow space-y-2">
                         <div className="flex items-center justify-between space-x-2">
                             <div className="flex items-center gap-2">

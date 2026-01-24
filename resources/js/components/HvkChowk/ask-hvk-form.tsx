@@ -213,7 +213,7 @@ const AskHvkForm = ({ user }: AskHvkFormProps) => {
                     <button
                         type="submit"
                         disabled={createQuestionMutation.isPending}
-                        className="inline-flex min-w-56 cursor-pointer items-center justify-center rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-gray-800 shadow-sm"
+                        className="inline-flex min-w-56 cursor-pointer items-center justify-center self-end rounded-md border border-transparent bg-primary px-4 py-2 text-sm font-medium text-gray-800 shadow-sm"
                     >
                         {createQuestionMutation.isPending ? (
                             <div className="flex items-center justify-center">
