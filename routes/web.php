@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\GoogleAuthController;
+use App\Http\Controllers\Auth\FacebookAuthController;
 use App\Http\Controllers\QuestionsController;
 use App\Http\Controllers\QuestionCommentController;
 use App\Http\Controllers\PollsController;
@@ -31,6 +33,14 @@ Route::middleware('guest')->group(function () {
     })->name('auth.signin');
 
     Route::post('/auth/login', [LoginController::class, 'login']);
+
+    // Google OAuth Routes
+    Route::get('/auth/google', [GoogleAuthController::class, 'redirect'])->name('auth.google');
+    Route::get('/auth/google/callback', [GoogleAuthController::class, 'callback']);
+
+    // Facebook OAuth Routes
+    Route::get('/auth/facebook', [FacebookAuthController::class, 'redirect'])->name('auth.facebook');
+    Route::get('/auth/facebook/callback', [FacebookAuthController::class, 'callback']);
 });
 
 Route::middleware(['auth.redirect'])->group(function () {
