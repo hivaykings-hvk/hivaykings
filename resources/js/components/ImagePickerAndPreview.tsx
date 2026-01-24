@@ -2,8 +2,9 @@
 
 import { Button } from '@/Components/ui/button';
 import { useFileUpload } from '@/hooks/use-file-upload';
-import { CircleUserRoundIcon, XIcon } from 'lucide-react';
+import { XIcon } from 'lucide-react';
 import { useEffect } from 'react';
+import { FaUser } from 'react-icons/fa6';
 
 interface ImagePickerProps {
     value?: File;
@@ -32,7 +33,7 @@ export default function ImagePickerAndPreview({ value, onChange }: ImagePickerPr
                 {/* Drop area */}
                 <button
                     aria-label={previewUrl ? 'Change image' : 'Upload image'}
-                    className="relative flex size-16 items-center justify-center overflow-hidden rounded-full border border-dashed border-input transition-colors outline-none hover:bg-accent/50 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none data-[dragging=true]:bg-accent/50"
+                    className="relative flex size-35 items-center justify-center overflow-hidden rounded-full border border-input bg-accent transition-colors outline-none hover:bg-accent/50 focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50 has-disabled:pointer-events-none has-disabled:opacity-50 has-[img]:border-none data-[dragging=true]:bg-accent/50"
                     data-dragging={isDragging || undefined}
                     onClick={openFileDialog}
                     onDragEnter={handleDragEnter}
@@ -52,7 +53,7 @@ export default function ImagePickerAndPreview({ value, onChange }: ImagePickerPr
                         />
                     ) : (
                         <div aria-hidden="true">
-                            <CircleUserRoundIcon className="size-4 opacity-60" />
+                            <FaUser className="size-16 text-gray-500 opacity-60" />
                         </div>
                     )}
                 </button>
