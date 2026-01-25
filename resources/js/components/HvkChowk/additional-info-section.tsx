@@ -1,50 +1,44 @@
-import { AlertCircle, Camera, Coffee, MapPin } from 'lucide-react';
+import { BsFillFuelPumpFill } from 'react-icons/bs';
+import { FaCamera, FaLightbulb, FaMap } from 'react-icons/fa6';
 
 export default function AdditionalInfoSection() {
-    const sections = [
+    const infoCards = [
         {
-            icon: MapPin,
-            title: 'Map View',
-            description: 'View the route on an interactive map',
+            icon: <FaMap className="h-8 w-8 text-gray-800" />,
+            title: 'Request map in RoutO',
+            description: 'HVK designed offline map for ease of navigation & support.',
         },
         {
-            icon: Coffee,
-            title: 'Facilities & Services',
-            description: 'Restaurants, hotels, and rest stops along the route',
+            icon: <BsFillFuelPumpFill className="h-8 w-8 text-gray-800" />,
+            title: 'Facilities',
+            description: 'Fuel stations, restaurants, and rest areas along route',
         },
         {
-            icon: AlertCircle,
+            icon: <FaLightbulb className="h-8 w-8 text-gray-800" />,
             title: 'Travel Tips',
-            description: 'Important tips and safety information for travelers',
+            description: 'Weather updates, driving advice, and seasonal alerts',
         },
         {
-            icon: Camera,
+            icon: <FaCamera className="h-8 w-8 text-gray-800" />,
             title: 'Photo Gallery',
-            description: 'Photos shared by travelers on this road',
+            description: 'User-uploaded scenic images from the route',
         },
     ];
-
     return (
-        <div className="bg-white py-12">
-            <div className="container mx-auto px-4">
-                <h2 className="mb-8 text-3xl font-bold text-gray-800">Additional Information</h2>
-
+        <div className="bg-white">
+            <div className="container mx-auto px-4 py-8">
+                <h2 className="mb-6 text-2xl font-semibold text-gray-800">Additional Information</h2>
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
-                    {sections.map((section, idx) => {
-                        const Icon = section.icon;
-                        return (
-                            <div
-                                key={idx}
-                                className="flex cursor-pointer flex-col items-center rounded-lg border border-gray-200 bg-gray-50 p-6 text-center transition-all hover:border-yellow-300 hover:bg-yellow-50"
-                            >
-                                <div className="mb-4 rounded-full bg-yellow-100 p-3">
-                                    <Icon className="h-6 w-6 text-yellow-600" />
-                                </div>
-                                <h3 className="mb-2 font-semibold text-gray-800">{section.title}</h3>
-                                <p className="text-sm text-gray-600">{section.description}</p>
+                    {infoCards.map((card, index) => (
+                        <div key={index} className="flex flex-col items-start rounded-lg bg-gray-50 p-6 shadow-sm">
+                            <div className="mb-4 flex items-center gap-4">
+                                <div className="h-5 w-5 text-gray-800">{card.icon}</div>
+                                <div className="text-md font-semibold text-gray-800">{card.title}</div>
                             </div>
-                        );
-                    })}
+
+                            <p className="text-sm text-gray-600">{card.description}</p>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

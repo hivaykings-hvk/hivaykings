@@ -7,6 +7,7 @@ import ReviewCard from '@/Components/HvkChowk/review-card';
 import RoadRatingInputForm from '@/Components/HvkChowk/road-rating-input-form';
 import LoadingSpinner from '@/Components/spinner';
 import { Button } from '@/Components/ui/button';
+import RootLayout from '@/Layouts/RootLayout';
 import { Link, usePage } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -20,7 +21,7 @@ interface RoadRating {
     highwayNumber: string;
     description: string;
     distanceKm: number;
-    travelTimeMin: number;
+    travelTimeHours: number;
     image: string;
     region: string;
     chiefUser: {
@@ -107,7 +108,7 @@ function RoadRatingDetailContent() {
                             </h1>
                             <div className="mb-4 inline-flex">
                                 <FaCircleCheck className="mr-1 h-3 w-3 text-gray-800 md:h-5 md:w-5" />
-                                <span className="text-[10px] font-semibold text-gray-800 md:text-sm">
+                                <span className="text-[10px] font-semibold text-gray-800">
                                     Reviewed by {roadRating.chiefUser.firstName} {roadRating.chiefUser.lastName} (Chief)
                                 </span>
                             </div>
@@ -121,9 +122,7 @@ function RoadRatingDetailContent() {
                                 <div className="text-gray-500">Distance</div>
                             </div>
                             <div>
-                                <div className="text-2xl font-semibold text-gray-800">
-                                    {Math.floor(roadRating.travelTimeMin / 60)} - {Math.floor(roadRating.travelTimeMin / 60) + 1} hrs
-                                </div>
+                                <div className="text-2xl font-semibold text-gray-800">{roadRating.travelTimeHours} hours</div>
                                 <div className="text-gray-500">Estimated Time</div>
                             </div>
                         </div>
@@ -149,9 +148,9 @@ function RoadRatingDetailContent() {
 
                     {/* Right Section - Image */}
                     <div
-                        className="relative h-96 w-full overflow-hidden rounded-lg bg-cover bg-center shadow-lg lg:h-96 lg:w-1/2"
+                        className="relative h-96 w-full overflow-hidden rounded-lg bg-cover bg-center shadow-lg lg:w-1/2"
                         style={{
-                            backgroundImage: `url(${process.env.VITE_OCI_BUCKET_BASE_URL}/${roadRating.image})`,
+                            backgroundImage: `url(${'/storage/' + roadRating.image})`,
                         }}
                     >
                         <Button variant="secondary" size="icon" className="absolute top-4 right-4 rounded-full">
@@ -179,12 +178,8 @@ function RoadRatingDetailContent() {
                 }}
             />
 
-            <div className="bg-yellow-50">
-                <div className="container mx-auto px-4 py-8">
-                    <h2 className="mb-6 text-2xl font-bold text-gray-800">Rate This Road</h2>
-                    <p className="mb-4 text-gray-600">Share your experience on this highway to help other travelers.</p>
-                    <RoadRatingInputForm roadRatingId={roadRating.id} />
-                </div>
+            <div className="bg-white">
+                <RoadRatingInputForm roadRatingId={roadRating.id} />
             </div>
 
             <div className="bg-gray-50">
@@ -219,3 +214,7 @@ export default function RoadRatingDetailPage() {
         </ReactQueryProvider>
     );
 }
+
+RoadRatingDetailPage.layout = function (page: React.ReactNode) {
+    return <RootLayout>{page}</RootLayout>;
+};

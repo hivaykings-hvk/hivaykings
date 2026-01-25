@@ -28,8 +28,8 @@ function HvkChowkPage({ user }: HvkChowkPageProps) {
                         <LeftSidebarDesktop className="hidden w-1/4 lg:block" />
 
                         {/* Main Content */}
-                        <div className="w-full bg-gray-50 lg:w-3/4">
-                            <div className="mx-auto max-w-3xl px-4 py-4">
+                        <div className="w-full bg-gray-50">
+                            <div className="mx-auto px-4 py-4 lg:px-16">
                                 {!user && (
                                     <div className="flex items-center justify-center lg:items-start lg:justify-start">
                                         <Link

@@ -1,14 +1,17 @@
 'use client';
 
+import roadRatingHeroImage from '@/assets/images/road-ratings/road-ratings-hero.png';
 import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
 import LoadingSpinner from '@/Components/spinner';
 import { Button } from '@/Components/ui/button';
 import { Input } from '@/Components/ui/input';
+import RootLayout from '@/Layouts/RootLayout';
 import { Link } from '@inertiajs/react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useEffect, useRef, useState } from 'react';
 import { FaMapMarkedAlt, FaMountain, FaRoute, FaShieldAlt, FaStar, FaUsers } from 'react-icons/fa';
+import { LuSearch } from 'react-icons/lu';
 
 interface RoadRating {
     id: string;
@@ -110,15 +113,14 @@ function RoadRatingsContent() {
         <>
             {/* Hero Section */}
             <div
-                className="bg-cover bg-center py-16 opacity-90"
+                className="bg-neutral-800 bg-cover bg-center py-16 opacity-70 bg-blend-overlay"
                 style={{
-                    backgroundImage:
-                        'linear-gradient(rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.4)), url(https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1200&q=80)',
+                    backgroundImage: `url(${roadRatingHeroImage})`,
                     backgroundPosition: 'center',
                     backgroundSize: 'cover',
                 }}
             >
-                <div className="mx-auto flex h-full max-w-6xl flex-col items-start justify-center px-4 text-white lg:px-20">
+                <div className="flex h-full flex-col items-start justify-center px-4 text-white lg:px-20">
                     <h1 className="mb-4 text-5xl font-normal md:text-6xl">
                         Road Ratings -{' '}
                         <span className="text-yellow-400">
@@ -130,18 +132,17 @@ function RoadRatingsContent() {
                         Explore trusted highway reviews, updated quarterly by HV Kumar (Chief), and powered by community experiences. Find the best
                         routes, track road conditions, and share your journey safely.
                     </p>
-                    <Link href="/road-ratings/create">
-                        <Button className="flex items-center space-x-2 rounded-lg bg-yellow-500 px-6 py-3 text-lg font-bold text-gray-900 hover:bg-yellow-600">
-                            <FaRoute className="text-xl" />
-                            <span>Create Rating</span>
-                        </Button>
-                    </Link>
+                    <Button className="flex items-center space-x-2 rounded-lg bg-yellow-500 px-6 py-3 text-lg font-bold text-gray-900 hover:bg-yellow-600">
+                        <FaRoute className="text-xl" />
+                        <span>Browse Highways</span>
+                    </Button>
                 </div>
             </div>
 
             {/* Search and Filter Section */}
             <div className="container mx-auto flex flex-col items-center justify-between space-y-4 px-4 py-8 md:flex-row md:space-y-0 md:space-x-4">
                 <div className="relative flex w-full flex-grow items-center md:w-auto">
+                    <LuSearch className="absolute left-3 text-gray-500" />
                     <Input
                         type="text"
                         placeholder="Search by highway name or route..."
@@ -154,35 +155,35 @@ function RoadRatingsContent() {
                     <Button
                         onClick={() => setSelectedRegion('all')}
                         variant={selectedRegion === 'all' ? 'default' : 'outline'}
-                        className="rounded-full px-4 py-2"
+                        className="rounded-full px-4 py-2 text-gray-800"
                     >
                         All Regions
                     </Button>
                     <Button
                         onClick={() => setSelectedRegion('north')}
                         variant={selectedRegion === 'north' ? 'default' : 'outline'}
-                        className="rounded-full px-4 py-2"
+                        className="rounded-full px-4 py-2 text-gray-800"
                     >
                         North
                     </Button>
                     <Button
                         onClick={() => setSelectedRegion('south')}
                         variant={selectedRegion === 'south' ? 'default' : 'outline'}
-                        className="rounded-full px-4 py-2"
+                        className="rounded-full px-4 py-2 text-gray-800"
                     >
                         South
                     </Button>
                     <Button
                         onClick={() => setSelectedRegion('east')}
                         variant={selectedRegion === 'east' ? 'default' : 'outline'}
-                        className="rounded-full px-4 py-2"
+                        className="rounded-full px-4 py-2 text-gray-800"
                     >
                         East
                     </Button>
                     <Button
                         onClick={() => setSelectedRegion('west')}
                         variant={selectedRegion === 'west' ? 'default' : 'outline'}
-                        className="rounded-full px-4 py-2"
+                        className="rounded-full px-4 py-2 text-gray-800"
                     >
                         West
                     </Button>
@@ -208,7 +209,7 @@ function RoadRatingsContent() {
                                             <div
                                                 className="h-60 w-full bg-cover bg-center"
                                                 style={{
-                                                    backgroundImage: `url(${process.env.VITE_OCI_BUCKET_BASE_URL}/${rating.image})`,
+                                                    backgroundImage: `url(${'/storage/' + rating.image})`,
                                                 }}
                                             ></div>
                                             <div className="px-4 py-6">
@@ -256,7 +257,7 @@ function RoadRatingsContent() {
 
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
                     <div className="flex flex-col items-center p-4">
-                        <div className="mb-4 rounded-full bg-yellow-500 p-4">
+                        <div className="mb-4 rounded-full bg-primary p-4">
                             <FaShieldAlt className="text-3xl text-gray-800" />
                         </div>
                         <h3 className="mb-2 text-xl font-semibold">Safety</h3>
@@ -266,7 +267,7 @@ function RoadRatingsContent() {
                     </div>
 
                     <div className="flex flex-col items-center p-4">
-                        <div className="mb-4 rounded-full bg-yellow-500 p-4">
+                        <div className="mb-4 rounded-full bg-primary p-4">
                             <FaMapMarkedAlt className="text-3xl text-gray-800" />
                         </div>
                         <h3 className="mb-2 text-xl font-semibold">Travel Planning</h3>
@@ -274,7 +275,7 @@ function RoadRatingsContent() {
                     </div>
 
                     <div className="flex flex-col items-center p-4">
-                        <div className="mb-4 rounded-full bg-yellow-500 p-4">
+                        <div className="mb-4 rounded-full bg-primary p-4">
                             <FaMountain className="text-3xl text-gray-800" />
                         </div>
                         <h3 className="mb-2 text-xl font-semibold">Scenic Spots</h3>
@@ -282,7 +283,7 @@ function RoadRatingsContent() {
                     </div>
 
                     <div className="flex flex-col items-center p-4">
-                        <div className="mb-4 rounded-full bg-yellow-500 p-4">
+                        <div className="mb-4 rounded-full bg-primary p-4">
                             <FaUsers className="text-3xl text-gray-800" />
                         </div>
                         <h3 className="mb-2 text-xl font-semibold">Community</h3>
@@ -297,7 +298,7 @@ function RoadRatingsContent() {
                     <h2 className="mb-4 text-4xl font-bold">How Our Ratings Work</h2>
                     <div className="mt-10 grid grid-cols-1 gap-8 md:grid-cols-3">
                         <div className="flex flex-col items-center rounded-lg bg-white p-6 text-center shadow-md">
-                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-500 text-xl font-bold text-gray-800">
+                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-xl font-bold text-gray-800">
                                 1
                             </div>
                             <h3 className="mb-2 text-xl font-semibold">Chief Verification</h3>
@@ -305,7 +306,7 @@ function RoadRatingsContent() {
                         </div>
 
                         <div className="flex flex-col items-center rounded-lg bg-white p-6 text-center shadow-md">
-                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-500 text-xl font-bold text-gray-800">
+                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-xl font-bold text-gray-800">
                                 2
                             </div>
                             <h3 className="mb-2 text-xl font-semibold">Community Input</h3>
@@ -313,7 +314,7 @@ function RoadRatingsContent() {
                         </div>
 
                         <div className="flex flex-col items-center rounded-lg bg-white p-6 text-center shadow-md">
-                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-yellow-500 text-xl font-bold text-gray-800">
+                            <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary text-xl font-bold text-gray-800">
                                 3
                             </div>
                             <h3 className="mb-2 text-xl font-semibold">Live Updates</h3>
@@ -333,3 +334,7 @@ export default function RoadRatingsPage() {
         </ReactQueryProvider>
     );
 }
+
+RoadRatingsPage.layout = function (page: React.ReactNode) {
+    return <RootLayout>{page}</RootLayout>;
+};

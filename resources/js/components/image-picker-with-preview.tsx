@@ -5,6 +5,7 @@ import { FaCamera, FaTimes } from 'react-icons/fa';
 
 interface ImagePickerWithPreviewProps {
     onImageSelected: (base64: string) => void;
+    onFileSelected?: (file: File) => void;
     onValueChange?: (base64: string) => void;
     value?: string;
     previewText?: string;
@@ -15,6 +16,7 @@ interface ImagePickerWithPreviewProps {
 
 export default function ImagePickerWithPreview({
     onImageSelected,
+    onFileSelected,
     onValueChange,
     value,
     previewText = 'Preview',
@@ -31,6 +33,7 @@ export default function ImagePickerWithPreview({
                 const base64String = reader.result as string;
                 setPreview(base64String);
                 onImageSelected(base64String);
+                onFileSelected?.(file);
                 onValueChange?.(base64String);
             };
             reader.readAsDataURL(file);

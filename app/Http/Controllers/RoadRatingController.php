@@ -8,6 +8,7 @@ use App\Models\UserRoadRating;
 use App\Models\RoadRatingComment;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 class RoadRatingController extends Controller
 {
@@ -103,7 +104,7 @@ class RoadRatingController extends Controller
                 'highwayNumber' => $rating->highway_number,
                 'description' => $rating->description,
                 'distanceKm' => $rating->distance_km,
-                'travelTimeMin' => $rating->travel_time_min,
+                'travelTimeHours' => $rating->travel_time_hours,
                 'image' => $rating->image,
                 'region' => $rating->region,
                 'chiefUser' => $rating->user ? [
@@ -166,37 +167,58 @@ class RoadRatingController extends Controller
             'highway_number' => 'required|string|min:2|max:50',
             'description' => 'required|string|min:10|max:5000',
             'distance_km' => 'required|numeric|min:0',
-            'travel_time_min' => 'required|numeric|min:0',
-            'image' => 'required|string',
+            'travel_time_hours' => 'required|numeric|min:0',
+            'image' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120',
             'region' => 'required|in:north,south,east,west,central',
         ]);
 
-        $rating = RoadRating::create([
-            'user_id' => Auth::id(),
-            'from_city' => $validated['from_city'],
-            'to_city' => $validated['to_city'],
-            'highway_number' => $validated['highway_number'],
-            'description' => $validated['description'],
-            'distance_km' => $validated['distance_km'],
-            'travel_time_min' => $validated['travel_time_min'],
-            'image' => $validated['image'],
-            'region' => $validated['region'],
-        ]);
+        try {
+            // Store image in storage/app/public/avatars/{userId}/road-ratings-images/{uuid}.{ext}
+            $imagePath = null;
+            if ($request->hasFile('image')) {
+                $userId = Auth::id();
+                $fileUuid = Str::uuid();
+                $originalExtension = $request->file('image')->getClientOriginalExtension();
+                $filename = $fileUuid . '.' . $originalExtension;
+                
+                $imagePath = $request->file('image')->store(
+                    "road-ratings-images/{$userId}",
+                    'public'
+                );
+            }
 
-        return response()->json([
-            'data' => [
-                'id' => $rating->id,
-                'fromCity' => $rating->from_city,
-                'toCity' => $rating->to_city,
-                'highwayNumber' => $rating->highway_number,
-                'description' => $rating->description,
-                'distanceKm' => $rating->distance_km,
-                'travelTimeMin' => $rating->travel_time_min,
-                'image' => $rating->image,
-                'region' => $rating->region,
-                'createdAt' => $rating->created_at,
-            ]
-        ], 201);
+            $rating = RoadRating::create([
+                'user_id' => Auth::id(),
+                'from_city' => $validated['from_city'],
+                'to_city' => $validated['to_city'],
+                'highway_number' => $validated['highway_number'],
+                'description' => $validated['description'],
+                'distance_km' => $validated['distance_km'],
+                'travel_time_hours' => $validated['travel_time_hours'],
+                'image' => $imagePath,
+                'region' => $validated['region'],
+            ]);
+
+            return response()->json([
+                'data' => [
+                    'id' => $rating->id,
+                    'fromCity' => $rating->from_city,
+                    'toCity' => $rating->to_city,
+                    'highwayNumber' => $rating->highway_number,
+                    'description' => $rating->description,
+                    'distanceKm' => $rating->distance_km,
+                    'travelTimeHours' => $rating->travel_time_hours,
+                    'image' => $rating->image,
+                    'region' => $rating->region,
+                    'createdAt' => $rating->created_at,
+                ]
+            ], 201);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to create road rating.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
 
     public function storeUserRating(Request $request, $roadRatingId)

@@ -1,112 +1,170 @@
 'use client';
 
-import { Button } from '@/Components/ui/button';
+import RichTextEditor from '@/Components/RichTextEditor';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { useState } from 'react';
+import { Plus, Star } from 'lucide-react';
+import React, { useState } from 'react';
 import { toast } from 'sonner';
 
 interface RoadRatingInputFormProps {
     roadRatingId: string;
 }
 
-export default function RoadRatingInputForm({ roadRatingId }: RoadRatingInputFormProps) {
+const ratingCriteria = ['Road Condition', 'Traffic', 'Facilities', 'Safety Index', 'Scenic Value'];
+
+const RoadRatingInputForm: React.FC<RoadRatingInputFormProps> = ({ roadRatingId }) => {
     const queryClient = useQueryClient();
-    const [ratings, setRatings] = useState({
-        roadCondition: 0,
-        traffic: 0,
-        facilities: 0,
-        safetyIndex: 0,
-        scenicValue: 0,
+    const [ratings, setRatings] = useState<Record<string, number>>({
+        'Road Condition': 0,
+        Traffic: 0,
+        Facilities: 0,
+        'Safety Index': 0,
+        'Scenic Value': 0,
     });
+    const [hoverRatings, setHoverRatings] = useState<Record<string, number>>({
+        'Road Condition': 0,
+        Traffic: 0,
+        Facilities: 0,
+        'Safety Index': 0,
+        'Scenic Value': 0,
+    });
+    const [comment, setComment] = useState<string>('');
 
     const { mutate: submitRating, isPending } = useMutation({
         mutationFn: async () => {
-            // Transform camelCase to snake_case for API
-            const transformedData = {
-                road_condition: ratings.roadCondition,
-                traffic: ratings.traffic,
-                facilities: ratings.facilities,
-                safety_index: ratings.safetyIndex,
-                scenic_value: ratings.scenicValue,
+            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content') || '';
+
+            // First, save the ratings
+            const reviewData = {
+                road_condition: ratings['Road Condition'],
+                traffic: ratings['Traffic'],
+                facilities: ratings['Facilities'],
+                safety_index: ratings['Safety Index'],
+                scenic_value: ratings['Scenic Value'],
             };
-            const response = await axios.post(`/api/road-ratings/${roadRatingId}/user-rating`, transformedData);
-            return response.data;
+
+            const ratingResponse = await axios.post(`/api/road-ratings/${roadRatingId}/user-rating`, reviewData, {
+                headers: {
+                    'X-CSRF-Token': csrfToken,
+                    'X-Requested-With': 'XMLHttpRequest',
+                },
+            });
+
+            // Then, save the comment if it exists
+            if (comment.trim()) {
+                await axios.post(
+                    `/api/road-ratings/${roadRatingId}/comments`,
+                    { content: comment },
+                    {
+                        headers: {
+                            'X-CSRF-Token': csrfToken,
+                            'X-Requested-With': 'XMLHttpRequest',
+                        },
+                    },
+                );
+            }
+
+            return ratingResponse.data;
         },
         onSuccess: () => {
-            toast.success('Thank you for rating this road!');
+            toast.success('Rating submitted successfully!');
             setRatings({
-                roadCondition: 0,
-                traffic: 0,
-                facilities: 0,
-                safetyIndex: 0,
-                scenicValue: 0,
+                'Road Condition': 0,
+                Traffic: 0,
+                Facilities: 0,
+                'Safety Index': 0,
+                'Scenic Value': 0,
             });
+            setComment('');
             queryClient.invalidateQueries({ queryKey: ['road-rating', roadRatingId] });
         },
         onError: (error: any) => {
-            toast.error(error.response?.data?.message || 'Failed to submit rating');
+            console.error('Error submitting rating:', error);
+            toast.error(error.response?.data?.message || 'Failed to submit rating.');
         },
     });
 
-    const handleRatingChange = (field: string, value: number) => {
-        setRatings((prev) => ({
-            ...prev,
-            [field]: value,
-        }));
+    const handleStarClick = (criterion: string, rating: number) => {
+        setRatings((prev) => ({ ...prev, [criterion]: rating }));
     };
 
-    const renderRatingStars = (field: string, value: number) => {
-        const stars = [];
-        for (let i = 1; i <= 5; i++) {
-            stars.push(
-                <button
-                    key={i}
-                    type="button"
-                    onClick={() => handleRatingChange(field, i)}
-                    className={`text-2xl transition-colors ${i <= value ? 'text-yellow-500' : 'text-gray-300 hover:text-yellow-300'}`}
-                >
-                    ★
-                </button>,
-            );
-        }
-        return stars;
+    const handleStarHover = (criterion: string, rating: number) => {
+        setHoverRatings((prev) => ({ ...prev, [criterion]: rating }));
+    };
+
+    const handleStarLeave = (criterion: string) => {
+        setHoverRatings((prev) => ({ ...prev, [criterion]: 0 }));
+    };
+
+    const handleSubmit = () => {
+        submitRating();
     };
 
     return (
-        <div className="space-y-4">
-            <div>
-                <label className="mb-2 block text-sm font-semibold">Road Condition</label>
-                <div className="flex gap-2">{renderRatingStars('roadCondition', ratings.roadCondition)}</div>
-            </div>
+        <div className="container mx-auto bg-white py-6 pb-12">
+            <div className="flex-none items-center justify-center px-4 lg:flex">
+                <div className="mt-8 rounded-lg border-t border-t-gray-100 p-6 shadow-xl lg:w-1/2">
+                    <h2 className="mb-6 text-2xl font-bold">Rate This Highway</h2>
 
-            <div>
-                <label className="mb-2 block text-sm font-semibold">Traffic Conditions</label>
-                <div className="flex gap-2">{renderRatingStars('traffic', ratings.traffic)}</div>
-            </div>
+                    <div className="mb-8 grid grid-cols-1 gap-y-6 md:grid-cols-2 md:gap-x-12">
+                        {ratingCriteria.map((criterion) => (
+                            <div key={criterion}>
+                                <h3 className="mb-2 text-lg font-semibold">{criterion}</h3>
+                                <div className="flex">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <Star
+                                            key={star}
+                                            className={`h-6 w-6 cursor-pointer ${
+                                                (hoverRatings[criterion] || ratings[criterion]) >= star ? 'text-primary' : 'text-gray-300'
+                                            }`}
+                                            onClick={() => handleStarClick(criterion, star)}
+                                            onMouseEnter={() => handleStarHover(criterion, star)}
+                                            onMouseLeave={() => handleStarLeave(criterion)}
+                                            fill={(hoverRatings[criterion] || ratings[criterion]) >= star ? 'currentColor' : 'none'}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
 
-            <div>
-                <label className="mb-2 block text-sm font-semibold">Facilities</label>
-                <div className="flex gap-2">{renderRatingStars('facilities', ratings.facilities)}</div>
-            </div>
+                    <div className="mb-6">
+                        <h3 className="mb-2 text-lg font-semibold">Comments</h3>
+                        <RichTextEditor
+                            content={comment}
+                            onChange={(newContent) => setComment(newContent)}
+                            placeholder="Share your experience or tips..."
+                            menuItems={[
+                                'paragraph',
+                                'heading1',
+                                'heading2',
+                                'heading3',
+                                'heading4',
+                                'heading5',
+                                'heading6',
+                                'bold',
+                                'italic',
+                                'bulletList',
+                                'link',
+                                'image',
+                                'blockquote',
+                            ]}
+                        />
+                    </div>
 
-            <div>
-                <label className="mb-2 block text-sm font-semibold">Safety Index</label>
-                <div className="flex gap-2">{renderRatingStars('safetyIndex', ratings.safetyIndex)}</div>
+                    <button
+                        onClick={handleSubmit}
+                        disabled={isPending}
+                        className="mt-12 flex items-center gap-2 bg-white text-gray-800 hover:bg-white"
+                    >
+                        <Plus className="h-6 w-6 font-semibold text-gray-800" />
+                        <span className="text-md font-semibold hover:cursor-pointer">Add Your Rating</span>
+                    </button>
+                </div>
             </div>
-
-            <div>
-                <label className="mb-2 block text-sm font-semibold">Scenic Value</label>
-                <div className="flex gap-2">{renderRatingStars('scenicValue', ratings.scenicValue)}</div>
-            </div>
-
-            <Button
-                onClick={() => submitRating()}
-                disabled={isPending || Object.values(ratings).some((r) => r === 0)}
-                className="w-full bg-yellow-500 font-bold text-gray-900 hover:bg-yellow-600"
-            >
-                {isPending ? 'Submitting...' : 'Submit Rating'}
-            </Button>
         </div>
     );
-}
+};
+
+export default RoadRatingInputForm;

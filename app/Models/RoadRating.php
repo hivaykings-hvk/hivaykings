@@ -15,7 +15,7 @@ class RoadRating extends Model
         'highway_number',
         'description',
         'distance_km',
-        'travel_time_min',
+        'travel_time_hours',
         'image',
         'region',
     ];

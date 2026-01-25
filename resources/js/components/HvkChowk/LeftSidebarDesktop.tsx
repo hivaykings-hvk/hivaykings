@@ -6,7 +6,7 @@ interface LeftSidebarProps {
 
 const LeftSidebarDesktop = ({ className }: LeftSidebarProps) => {
     return (
-        <div className={`sticky top-[72px] h-full space-y-6 bg-white p-6 shadow-sm ${className}`}>
+        <div className={`sticky top-[72px] h-full space-y-6 bg-white p-6 shadow-md ${className}`}>
             {/* Trending Discussions */}
             <div>
                 <h2 className="mb-4 text-xl font-bold">Trending Discussions</h2>

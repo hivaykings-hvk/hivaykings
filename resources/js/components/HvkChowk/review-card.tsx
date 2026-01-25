@@ -1,69 +1,58 @@
-import { Button } from '@/Components/ui/button';
-import { Flag, MessageCircle, ThumbsUp } from 'lucide-react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { timeAgo } from '@/lib/time-functions';
+import { titleColorMap } from '@/lib/title-color-map';
+import parse from 'html-react-parser';
+import { FaRegComment, FaRegFlag, FaRegThumbsUp } from 'react-icons/fa6';
 
 interface ReviewCardProps {
     comment: string;
-    user: {
-        firstName: string;
-        lastName: string;
+    user?: {
+        firstName?: string;
+        lastName?: string;
+        title?: string;
         image?: string;
     };
-    createdAt: string;
+    createdAt?: string;
 }
 
-function getTimeAgo(date: string): string {
-    const now = new Date();
-    const commentDate = new Date(date);
-    const seconds = Math.floor((now.getTime() - commentDate.getTime()) / 1000);
-
-    if (seconds < 60) return 'just now';
-    if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-    if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-    if (seconds < 604800) return `${Math.floor(seconds / 86400)}d ago`;
-    return commentDate.toLocaleDateString();
-}
-
-export default function ReviewCard({ comment, user, createdAt }: ReviewCardProps) {
-    const initials = `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
-
+const ReviewCard = ({ comment, user, createdAt }: ReviewCardProps) => {
     return (
-        <div className="mb-6 rounded-lg border border-gray-200 bg-white p-4">
-            <div className="flex items-start gap-4">
-                {/* Avatar */}
-                <div className="flex-shrink-0">
-                    {user.image ? (
-                        <img src={user.image} alt={`${user.firstName} ${user.lastName}`} className="h-10 w-10 rounded-full object-cover" />
-                    ) : (
-                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100 text-sm font-semibold text-yellow-700">
-                            {initials}
-                        </div>
-                    )}
-                </div>
-
-                {/* Content */}
-                <div className="flex-1">
+        <div className={`mb-4 rounded-lg p-4 shadow-sm ${user?.title === 'Chief' ? 'bg-yellow-50' : 'bg-white'}`}>
+            <div className="mb-2 flex items-start">
+                <Avatar className="mr-3 h-10 w-10">
+                    <AvatarImage src={user?.image ? `/storage/${user.image}` : ''} alt={user?.firstName} className="object-cover" />
+                    <AvatarFallback>{`${user?.firstName?.[0]}${user?.lastName?.[0]}`}</AvatarFallback>
+                </Avatar>
+                <div>
                     <div className="flex items-center gap-2">
-                        <h4 className="font-semibold text-gray-800">
-                            {user.firstName} {user.lastName}
-                        </h4>
-                        <span className="text-sm text-gray-500">{getTimeAgo(createdAt)}</span>
+                        <div className="font-semibold text-gray-800">
+                            {user?.firstName} {user?.lastName}
+                        </div>
+                        <div
+                            className={`${user?.title && titleColorMap[user.title]?.bgColor} ${
+                                user?.title && titleColorMap[user.title]?.textColor
+                            } rounded-[4px] px-2.5 py-0.5 text-xs font-normal`}
+                        >
+                            {user?.title}
+                        </div>
+                        <div className="text-sm text-gray-500">{createdAt && timeAgo(createdAt)}</div>
                     </div>
-                    <p className="mt-2 text-gray-700">{comment}</p>
-
-                    {/* Action Buttons */}
-                    <div className="mt-3 flex gap-4">
-                        <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-                            <ThumbsUp className="mr-1 h-4 w-4" /> Helpful
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-gray-600 hover:text-gray-900">
-                            <MessageCircle className="mr-1 h-4 w-4" /> Reply
-                        </Button>
-                        <Button variant="ghost" size="sm" className="text-gray-600 hover:text-red-600">
-                            <Flag className="mr-1 h-4 w-4" /> Report
-                        </Button>
+                    <div className="mt-4 text-gray-700">{comment && parse(comment)}</div>
+                    <div className="mt-2 flex items-center gap-4">
+                        <div className="inline-flex items-center gap-2 text-gray-500">
+                            <FaRegThumbsUp className="h-4 w-4 text-gray-500" /> <span className="text-sm">154 helpful</span>
+                        </div>
+                        <div className="inline-flex items-center gap-2 text-gray-500">
+                            <FaRegFlag className="h-4 w-4 text-gray-500" /> <span className="text-sm">Report</span>
+                        </div>
+                        <div className="inline-flex items-center gap-2 text-gray-500">
+                            <FaRegComment className="h-4 w-4 text-gray-500" /> <span className="text-sm">Reply</span>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     );
-}
+};
+
+export default ReviewCard;
