@@ -171,4 +171,19 @@ Route::middleware('auth')->group(function () {
     Route::get('/api/user/travelogues', [TravelogueController::class, 'userTravelogues']);
 });
 
+// User Profile API Routes (Protected)
+Route::middleware('auth')->group(function () {
+    Route::get('/api/user/profile', [\App\Http\Controllers\Api\UserProfileController::class, 'show']);
+    Route::put('/api/user/profile', [\App\Http\Controllers\Api\UserProfileController::class, 'update']);
+    Route::post('/api/user/change-password', [\App\Http\Controllers\Api\UserProfileController::class, 'changePassword']);
+    Route::post('/api/upload-profile-image', [\App\Http\Controllers\Api\UserProfileController::class, 'uploadImage']);
+});
+
+// Account Settings Page
+Route::middleware('auth')->group(function () {
+    Route::get('/account-settings', function () {
+        return Inertia::render('AccountSettings');
+    })->name('account-settings');
+});
+
 Route::middleware('auth')->post('/api/logout', [LoginController::class, 'logout']);
