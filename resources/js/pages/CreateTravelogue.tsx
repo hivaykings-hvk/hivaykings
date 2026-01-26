@@ -5,6 +5,7 @@ import RichTextEditor from '@/Components/RichTextEditor';
 import { Button } from '@/Components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
 import { Input } from '@/Components/ui/input';
+import RootLayout from '@/Layouts/RootLayout';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
 import { useRef, useState } from 'react';
@@ -111,7 +112,7 @@ function CreateTravelogueContent() {
     };
 
     return (
-        <div className="flex min-h-screen flex-col bg-gray-50">
+        <div className="flex min-h-screen flex-col bg-gray-50 px-6">
             <div className="container mx-auto flex flex-grow flex-col py-8">
                 <h1 className="mb-6 text-3xl font-bold text-gray-800">Create New Travelogue</h1>
                 <Form {...form}>
@@ -127,7 +128,7 @@ function CreateTravelogueContent() {
                                             <button
                                                 type="button"
                                                 onClick={handleRemoveImage}
-                                                className="absolute top-2 right-2 rounded-full bg-red-500 p-2 text-white hover:bg-red-600"
+                                                className="absolute top-2 right-2 rounded-full bg-primary p-2 text-gray-800"
                                             >
                                                 <FaTimes />
                                             </button>
@@ -206,7 +207,7 @@ function CreateTravelogueContent() {
                                 type="button"
                                 onClick={form.handleSubmit((values) => onSubmit(values, true))}
                                 disabled={form.formState.isSubmitting || !coverImageFile}
-                                className="inline-flex items-center bg-yellow-500 text-gray-800 hover:cursor-pointer hover:bg-yellow-600"
+                                className="inline-flex items-center bg-primary text-gray-800 hover:cursor-pointer"
                             >
                                 {form.formState.isSubmitting && <CgSpinner className="mr-2 animate-spin" />} Publish
                             </Button>
@@ -225,3 +226,7 @@ export default function CreateTraveloguePage() {
         </ReactQueryProvider>
     );
 }
+
+CreateTraveloguePage.layout = function (page: React.ReactNode) {
+    return <RootLayout>{page}</RootLayout>;
+};

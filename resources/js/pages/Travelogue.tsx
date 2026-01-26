@@ -1,11 +1,14 @@
 'use client';
 
+import heroImage from '@/assets/images/hero.png';
 import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
+import Link from '@/Components/Link';
 import LoadingSpinner from '@/Components/spinner';
 import { Button } from '@/Components/ui/button';
+import UserAvatar from '@/Components/UserAvatar';
+import RootLayout from '@/Layouts/RootLayout';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { Plus } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 
 interface TravelogueCardData {
@@ -38,24 +41,18 @@ const FeaturedStoryCard = ({ travelogue }: FeaturedStoryCardProps) => {
     const truncatedContent = content.replace(/<[^>]*>/g, '').substring(0, 150) + '...';
 
     return (
-        <a
-            href={`/travelogue/${travelogue.id}`}
-            className="flex transform cursor-pointer flex-col overflow-hidden rounded-lg bg-white shadow-lg transition-transform duration-300 hover:scale-105"
-        >
+        <a href={`/travelogue/${travelogue.id}`} className="flex transform cursor-pointer flex-col overflow-hidden rounded-lg bg-white shadow-lg">
             <div
                 className="h-60 w-full bg-cover bg-center"
                 style={{
-                    backgroundImage: `url(${process.env.VITE_OCI_BUCKET_BASE_URL}/${image})`,
+                    backgroundImage: `url(${'/storage/' + image})`,
                 }}
             ></div>
 
             <div className="flex flex-grow flex-col justify-between p-4">
                 <div>
                     <div className="mb-3 flex items-center">
-                        <div className="mr-2 flex h-8 w-8 items-center justify-center rounded-full bg-yellow-100 text-xs font-semibold text-yellow-700">
-                            {user.firstName[0]}
-                            {user.lastName[0]}
-                        </div>
+                        <UserAvatar imageUrl={user.image} firstName={user.firstName} lastName={user.lastName} />
                         <span className="text-sm font-semibold text-gray-800">{author}</span>
                         <span
                             className={`ml-2 rounded-full px-2 py-1 text-xs font-medium ${
@@ -164,29 +161,37 @@ const TravelogueContent = () => {
 function TraveloguePageContent() {
     return (
         <>
-            <div className="relative h-96 w-full overflow-hidden md:h-[600px]">
+            <div className="relative h-84 w-full overflow-hidden md:h-[600px]">
                 <div
                     className="h-full w-full bg-cover bg-center"
                     style={{
-                        backgroundImage: `url(${process.env.VITE_OCI_BUCKET_BASE_URL}/hero.png)`,
+                        backgroundImage: `url(${heroImage})`,
                     }}
                 >
                     <div className="absolute inset-0 bg-gradient-to-r from-black/60 to-transparent"></div>
                 </div>
                 <div className="absolute inset-0 z-10 flex h-full flex-col items-start justify-center p-8 text-white md:p-16 lg:p-24">
                     <h1 className="mb-4 text-4xl font-bold md:text-5xl lg:text-6xl">
-                        Your Journey, <span className="text-yellow-400">Your Story</span>
+                        Your Journey, <span className="text-primary">Your Story</span>
                     </h1>
                     <p className="mb-2 text-lg md:text-xl">Share it with the Tribe</p>
                     <p className="mb-8 max-w-xl text-base md:text-lg">
                         Post your road trip diaries, vlogs, videos, or destination stories to inspire fellow travelers.
                     </p>
-                    <div className="flex flex-wrap gap-4 space-x-4">
-                        <a href="/travelogue/create">
-                            <Button className="rounded-full bg-yellow-500 px-6 py-3 text-lg font-semibold text-black hover:bg-yellow-600">
-                                <Plus className="mr-2 h-5 w-5" /> Create a Story
-                            </Button>
-                        </a>
+                    <div className="flex space-x-4">
+                        <Button className="rounded-full bg-primary px-6 py-3 text-lg font-semibold text-gray-800 hover:bg-primary">
+                            <Link href="/travelogue/create" className="flex items-center">
+                                <span className="mr-2 text-xl">+</span> Create a Story
+                            </Link>
+                        </Button>
+                        <Button
+                            variant="outline"
+                            className="rounded-full border-2 border-primary bg-transparent px-6 py-3 text-lg text-primary hover:bg-primary hover:text-gray-800"
+                        >
+                            <Link href="/travelogue" className="flex items-center">
+                                Explore Stories
+                            </Link>
+                        </Button>
                     </div>
                 </div>
             </div>
@@ -203,3 +208,7 @@ export default function TraveloguePage() {
         </ReactQueryProvider>
     );
 }
+
+TraveloguePage.layout = function (page: React.ReactNode) {
+    return <RootLayout>{page}</RootLayout>;
+};

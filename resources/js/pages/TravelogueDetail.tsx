@@ -3,6 +3,8 @@
 import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
 import LoadingSpinner from '@/Components/spinner';
 import { Button } from '@/Components/ui/button';
+import UserAvatar from '@/Components/UserAvatar';
+import RootLayout from '@/Layouts/RootLayout';
 import { usePage } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -78,7 +80,7 @@ function TravelogueDetailContent() {
             <div
                 className="relative min-h-96 bg-neutral-700 bg-cover bg-center bg-blend-overlay md:min-h-[550px]"
                 style={{
-                    backgroundImage: `url(${process.env.VITE_OCI_BUCKET_BASE_URL}/${coverImage})`,
+                    backgroundImage: `url(${'/storage/' + coverImage})`,
                 }}
             >
                 <div className="absolute bottom-0 left-0 z-10 w-full p-8 text-white">
@@ -91,7 +93,7 @@ function TravelogueDetailContent() {
                             return (
                                 <>
                                     <span>{firstHalfWords}</span>
-                                    <span className="text-yellow-400">&nbsp;{secondHalfWords}</span>
+                                    <span className="text-primary">&nbsp;{secondHalfWords}</span>
                                 </>
                             );
                         })()}
@@ -104,10 +106,7 @@ function TravelogueDetailContent() {
                 <div className="container mx-auto px-4 py-8">
                     <div className="mb-6 flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
                         <div className="flex items-center space-x-4">
-                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-yellow-100 font-semibold text-yellow-700">
-                                {travelogue.user.firstName[0]}
-                                {travelogue.user.lastName[0]}
-                            </div>
+                            <UserAvatar imageUrl={travelogue.user.image} firstName={travelogue.user.firstName} lastName={travelogue.user.lastName} />
                             <div>
                                 <p className="text-lg font-semibold text-gray-800">{authorFullName}</p>
                                 <div className="flex items-center space-x-2 text-sm text-gray-600">
@@ -133,7 +132,7 @@ function TravelogueDetailContent() {
                                 <BookmarkIcon className="h-5 w-5" />
                                 <span>Save</span>
                             </Button>
-                            <Button className="bg-yellow-500 text-white hover:bg-yellow-600">Follow</Button>
+                            <Button className="bg-primary text-gray-800">Follow</Button>
                             <Button variant="outline" size="sm" className="flex items-center gap-2">
                                 <Share2 className="h-4 w-4" /> Share
                             </Button>
@@ -166,3 +165,7 @@ export default function TravelogueDetailPage() {
         </ReactQueryProvider>
     );
 }
+
+TravelogueDetailPage.layout = function (page: React.ReactNode) {
+    return <RootLayout>{page}</RootLayout>;
+};
