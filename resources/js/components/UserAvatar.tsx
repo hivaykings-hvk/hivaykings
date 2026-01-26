@@ -20,7 +20,7 @@ const UserAvatar = ({ imageUrl, firstName, lastName, className }: UserAvatarProp
     }
 
     return (
-        <Avatar className="z-50 h-10 w-10 bg-gray-100 focus:border-none focus:ring-0 focus:outline-none">
+        <Avatar className="h-10 w-10 bg-gray-100 focus:border-none focus:ring-0 focus:outline-none">
             <AvatarImage src={imageSrc} className={cn('object-cover', className)} />
             <AvatarFallback className={cn('bg-yellow-50 text-gray-800', className)}>{`${firstName.charAt(0)}${lastName.charAt(0)}`}</AvatarFallback>
         </Avatar>

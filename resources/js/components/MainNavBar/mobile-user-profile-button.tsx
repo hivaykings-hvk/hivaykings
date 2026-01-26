@@ -27,7 +27,7 @@ const MobileUserProfileButton = (props: MobileUserProfileProps) => {
                 imageUrl={props.imageUrl}
                 firstName={props.firstName}
                 lastName={props.lastName}
-                className="rounded-full border-2 border-primary"
+                className="z-50 rounded-full border-2 border-primary"
             />
         </button>
     );

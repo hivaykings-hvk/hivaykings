@@ -130,7 +130,7 @@ const NavBar = () => {
                                     imageUrl={user.image}
                                     firstName={user.firstName}
                                     lastName={user.lastName}
-                                    className="focus-outline-none rounded-full border-2 border-primary"
+                                    className="focus-outline-none z-50 rounded-full border-2 border-primary"
                                 />
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="mr-4 min-w-10 border-gray-800 bg-neutral-800 text-gray-50">
