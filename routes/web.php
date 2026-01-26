@@ -6,6 +6,7 @@ use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\GoogleAuthController;
 use App\Http\Controllers\Auth\FacebookAuthController;
+use App\Http\Controllers\Auth\EmailVerificationController;
 use App\Http\Controllers\QuestionsController;
 use App\Http\Controllers\QuestionCommentController;
 use App\Http\Controllers\PollsController;
@@ -41,6 +42,10 @@ Route::middleware('guest')->group(function () {
     // Facebook OAuth Routes
     Route::get('/auth/facebook', [FacebookAuthController::class, 'redirect'])->name('auth.facebook');
     Route::get('/auth/facebook/callback', [FacebookAuthController::class, 'callback']);
+
+    // Email Verification Routes
+    Route::get('/auth/verify-email/{token}', [EmailVerificationController::class, 'show'])->name('auth.verify-email');
+    Route::post('/auth/resend-verification-email', [EmailVerificationController::class, 'resend']);
 });
 
 Route::middleware(['auth.redirect'])->group(function () {

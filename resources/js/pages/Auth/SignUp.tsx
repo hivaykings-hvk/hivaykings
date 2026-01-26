@@ -94,12 +94,25 @@ function SignUpForm() {
             });
 
             if (response.status === 201) {
-                toast.success('Account created successfully! Redirecting to sign in...');
-                form.reset();
-                setSelectedImage(undefined);
-                setTimeout(() => {
-                    window.location.href = '/auth/signin?message=Registration successful. Please sign in with your credentials.';
-                }, 1500);
+                // Show message about email verification
+                if (response.data.requiresVerification) {
+                    toast.success('Registration successful, please check your email for verification');
+                    // Show verification pending page instead of redirecting
+                    form.reset();
+                    setSelectedImage(undefined);
+                    // Stay on page or redirect to verification pending page
+                    setTimeout(() => {
+                        window.location.href = `/auth/signin?message=Please verify your email before logging in. Check your inbox for the verification link.`;
+                    }, 2000);
+                } else {
+                    // For social login or other cases
+                    toast.success('Account created successfully! Redirecting to sign in...');
+                    form.reset();
+                    setSelectedImage(undefined);
+                    setTimeout(() => {
+                        window.location.href = '/auth/signin?message=Registration successful. Please sign in with your credentials.';
+                    }, 1500);
+                }
             }
         } catch (error: any) {
             const errorData = error.response?.data;
@@ -146,15 +159,15 @@ function SignUpForm() {
                                 render={() => (
                                     <FormItem>
                                         <FormControl>
-                                            <ImagePickerAndPreview 
-                                                value={selectedImage} 
+                                            <ImagePickerAndPreview
+                                                value={selectedImage}
                                                 onChange={(file) => {
                                                     setSelectedImage(file);
                                                     // Clear image error when image is selected
                                                     if (file) {
                                                         form.clearErrors('image');
                                                     }
-                                                }} 
+                                                }}
                                             />
                                         </FormControl>
                                         <FormMessage className="text-center text-red-400" />

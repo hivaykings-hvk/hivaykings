@@ -38,6 +38,7 @@ class GoogleAuthController extends Controller
                 'password' => bcrypt(Str::random(16)),
                 'image_path' => $this->downloadProfilePicture($user),
                 'subscribe_newsletter' => false,
+                'email_verified_at' => now(), // Auto-verify email for OAuth users
             ]);
 
             Auth::login($newUser, true);

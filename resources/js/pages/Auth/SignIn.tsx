@@ -53,6 +53,12 @@ function SignIn({ redirectUrl = '/' }: SignInPageProps) {
             const errorData = error.response?.data;
             const message = errorData?.message || 'An unexpected error occurred.';
             setErrorMessage(message);
+
+            // If email not verified, show resend option
+            if (errorData?.emailNotVerified) {
+                setErrorMessage(`${message} Email: ${errorData.email}`);
+            }
+
             toast.error(message);
         } finally {
             setLoading(false);

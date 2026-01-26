@@ -41,6 +41,7 @@ class FacebookAuthController
                 'username' => $username,
                 'password' => bcrypt(Str::random(16)),
                 'subscribe_newsletter' => false,
+                'email_verified_at' => now(), // Auto-verify email for OAuth users
             ]);
 
             // Download and store profile picture

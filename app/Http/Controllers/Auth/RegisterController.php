@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Mail\VerifyEmailMail;
+use App\Models\EmailVerificationToken;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Password;
 
@@ -54,11 +57,30 @@ class RegisterController extends Controller
                 'password' => Hash::make($validated['password']),
                 'image_path' => $imagePath,
                 'subscribe_newsletter' => $validated['subscribeNewsletter'] ?? false,
+                // email_verified_at remains null for manual registration
             ]);
 
+            // Create email verification token
+            $token = Str::random(64);
+            EmailVerificationToken::create([
+                'user_id' => $user->id,
+                'token' => $token,
+                'created_at' => now(),
+            ]);
+
+            // Send verification email
+            $verificationUrl = route('auth.verify-email', $token);
+            Mail::send(new VerifyEmailMail(
+                $user->email,
+                $user->first_name . ' ' . $user->last_name,
+                $verificationUrl,
+                $token
+            ));
+
             return response()->json([
-                'message' => 'Registration successful. Please sign in with your credentials.',
+                'message' => 'Registration successful. Please check your email for verification.',
                 'user' => $user,
+                'requiresVerification' => true,
             ], 201);
         } catch (\Exception $e) {
             return response()->json([

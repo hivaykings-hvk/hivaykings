@@ -16,6 +16,17 @@ class LoginController extends Controller
             'rememberMe' => 'boolean',
         ]);
 
+        // Check if user exists and verify email status
+        $user = \App\Models\User::where('email', $credentials['email'])->first();
+
+        if ($user && is_null($user->email_verified_at)) {
+            return response()->json([
+                'message' => 'Please verify your email address before logging in.',
+                'emailNotVerified' => true,
+                'email' => $credentials['email'],
+            ], 403);
+        }
+
         $rememberMe = $credentials['rememberMe'] ?? false;
 
         if (Auth::attempt(
