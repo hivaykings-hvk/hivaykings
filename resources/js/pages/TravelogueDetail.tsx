@@ -8,7 +8,9 @@ import RootLayout from '@/Layouts/RootLayout';
 import { usePage } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import parse, { DOMNode } from 'html-react-parser';
 import { BookmarkIcon, ChevronLeft, Heart, MessageCircle, Share2 } from 'lucide-react';
+import { FaCalendarDay, FaImages, FaLocationDot, FaRoute, FaVideo } from 'react-icons/fa6';
 
 interface PageProps {
     id: string;
@@ -73,6 +75,33 @@ function TravelogueDetailContent() {
         month: 'short',
         day: 'numeric',
     });
+
+    const iconMap: { [key: string]: React.ElementType } = {
+        facalendarday: FaCalendarDay,
+        faimages: FaImages,
+        favideo: FaVideo,
+        falocationdot: FaLocationDot,
+        faroute: FaRoute,
+    };
+
+    const options = {
+        replace: (domNode: DOMNode) => {
+            if ('name' in domNode && domNode.type === 'tag' && iconMap[domNode.name]) {
+                const IconComponent = iconMap[domNode.name];
+                const newAttribs = { ...domNode.attribs };
+                if (newAttribs.classname) {
+                    newAttribs.className = newAttribs.classname;
+                    delete newAttribs.classname;
+                }
+                return (
+                    <span className="inline-block">
+                        <IconComponent {...newAttribs} />
+                    </span>
+                );
+            }
+            return domNode;
+        },
+    };
 
     return (
         <div className="min-h-screen bg-gray-50">
@@ -141,7 +170,7 @@ function TravelogueDetailContent() {
 
                     {/* Travelogue Content */}
                     <div className="prose max-w-none">
-                        <div className="leading-relaxed whitespace-pre-wrap text-gray-700" dangerouslySetInnerHTML={{ __html: travelogue.content }} />
+                        <div>{parse(travelogue.content, options)}</div>
                     </div>
                 </div>
             </div>
