@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 use Inertia\Inertia;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\LoginController;
@@ -12,8 +13,7 @@ use App\Http\Controllers\QuestionCommentController;
 use App\Http\Controllers\PollsController;
 use App\Http\Controllers\RoadRatingController;
 use App\Http\Controllers\QuestionDetailController;
-use App\Http\Controllers\TravelogueController;
-use Illuminate\Http\Request;
+use App\Http\Controllers\ImageController;
 
 Route::get('/', function () {
     return Inertia::render('home');
@@ -177,6 +177,10 @@ Route::middleware('auth')->group(function () {
     Route::put('/api/user/profile', [\App\Http\Controllers\Api\UserProfileController::class, 'update']);
     Route::post('/api/user/change-password', [\App\Http\Controllers\Api\UserProfileController::class, 'changePassword']);
     Route::post('/api/upload-profile-image', [\App\Http\Controllers\Api\UserProfileController::class, 'uploadImage']);
+    
+    // Image Upload Routes for Rich Text Editor
+    Route::post('/api/upload-image', [ImageController::class, 'uploadImage']);
+    Route::get('/api/user-images', [ImageController::class, 'getUserImages']);
 });
 
 // Account Settings Page

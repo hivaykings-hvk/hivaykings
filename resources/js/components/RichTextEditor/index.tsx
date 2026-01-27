@@ -9,6 +9,7 @@ import StarterKit from '@tiptap/starter-kit';
 import React, { useEffect, useState } from 'react';
 import { ResizableImage } from 'tiptap-extension-resizable-image';
 import { convertIconsToJSX, convertJSXToIconsHTML } from './icon-html-converter';
+import ImageGallery from './image-gallery';
 import { IconExtension } from './tiptap-icon-extension';
 import TipTapMenuBar, { MenuItem } from './tiptap-menu-bar';
 
@@ -44,7 +45,7 @@ const RichTextEditorComponent = ({
                 },
                 paragraph: {
                     HTMLAttributes: {
-                        class: 'pb-3 overflow-hidden',
+                        class: 'pb-3 overflow-visible',
                     },
                 },
                 bulletList: {
@@ -108,6 +109,12 @@ const RichTextEditorComponent = ({
         }
     };
 
+    const handleImageSelect = (imageUrl: string) => {
+        if (editor) {
+            editor.chain().focus().setResizableImage({ src: imageUrl }).run();
+        }
+    };
+
     React.useImperativeHandle(forwardedRef, () => ({
         clearContent,
     }));
@@ -116,6 +123,7 @@ const RichTextEditorComponent = ({
         <>
             <EditorContent editor={editor} className="w-full" />
             <TipTapMenuBar editor={editor} onImageSelection={() => setShowImageGallery(true)} menuItems={menuItems} />
+            <ImageGallery visible={showImageGallery} onClose={setShowImageGallery} onImageSelect={handleImageSelect} />
         </>
     );
 };
