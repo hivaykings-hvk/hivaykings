@@ -14,6 +14,7 @@ use App\Http\Controllers\PollsController;
 use App\Http\Controllers\RoadRatingController;
 use App\Http\Controllers\QuestionDetailController;
 use App\Http\Controllers\ImageController;
+use App\Http\Controllers\TravelogueController;
 
 Route::get('/', function () {
     return Inertia::render('home');

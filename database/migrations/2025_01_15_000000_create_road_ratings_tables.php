@@ -12,48 +12,54 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('road_ratings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->uuid('id')->primary();
+            $table->uuid('user_id');
             $table->string('from_city');
             $table->string('to_city');
             $table->string('highway_number');
             $table->text('description');
             $table->integer('distance_km');
-            $table->integer('travel_time_min');
+            $table->integer('travel_time_hours');
             $table->longText('image');
             $table->enum('region', ['north', 'south', 'east', 'west', 'central']);
             $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
 
         Schema::create('chief_road_ratings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('road_rating_id')->constrained('road_ratings')->onDelete('cascade');
+            $table->uuid('id')->primary();
+            $table->uuid('road_rating_id');
             $table->float('road_condition');
             $table->float('traffic');
             $table->float('facilities');
             $table->float('safety_index');
             $table->float('scenic_value');
             $table->timestamps();
+            $table->foreign('road_rating_id')->references('id')->on('road_ratings')->onDelete('cascade');
         });
 
         Schema::create('user_road_ratings', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('road_rating_id')->constrained('road_ratings')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->uuid('id')->primary();
+            $table->uuid('road_rating_id');
+            $table->uuid('user_id');
             $table->float('road_condition');
             $table->float('traffic');
             $table->float('facilities');
             $table->float('safety_index');
             $table->float('scenic_value');
             $table->timestamps();
+            $table->foreign('road_rating_id')->references('id')->on('road_ratings')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
 
         Schema::create('road_rating_comments', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('road_rating_id')->constrained('road_ratings')->onDelete('cascade');
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+            $table->uuid('id')->primary();
+            $table->uuid('road_rating_id');
+            $table->uuid('user_id');
             $table->text('content');
             $table->timestamps();
+            $table->foreign('road_rating_id')->references('id')->on('road_ratings')->onDelete('cascade');
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

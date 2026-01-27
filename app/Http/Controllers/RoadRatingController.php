@@ -53,7 +53,7 @@ class RoadRatingController extends Controller
                 'highwayNumber' => $rating->highway_number,
                 'description' => $rating->description,
                 'distanceKm' => $rating->distance_km,
-                'travelTimeMin' => $rating->travel_time_min,
+                'travelTimeHours' => $rating->travel_time_hours,
                 'image' => $rating->image,
                 'region' => $rating->region,
                 'chiefUser' => $rating->user ? [

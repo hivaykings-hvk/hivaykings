@@ -12,10 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('question_comments', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('question_id');
-            $table->unsignedBigInteger('user_id');
-            $table->unsignedBigInteger('parent_id')->nullable();
+            $table->uuid('id')->primary();
+            $table->uuid('question_id');
+            $table->uuid('user_id');
+            $table->uuid('parent_id')->nullable();
             $table->longText('content');
             $table->integer('likes_count')->default(0);
             $table->timestamps();

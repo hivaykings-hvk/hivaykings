@@ -12,8 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('poll_options', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('poll_id');
+            $table->uuid('id')->primary();
+            $table->uuid('poll_id');
             $table->string('option_text');
             $table->integer('votes')->default(0);
             $table->timestamps();

@@ -12,9 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('poll_votes', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('poll_option_id');
-            $table->unsignedBigInteger('user_id')->nullable();
+            $table->uuid('id')->primary();
+            $table->uuid('poll_option_id');
+            $table->uuid('user_id')->nullable();
             $table->string('ip_address')->nullable();
             $table->timestamps();
             $table->foreign('poll_option_id')->references('id')->on('poll_options')->onDelete('cascade');
