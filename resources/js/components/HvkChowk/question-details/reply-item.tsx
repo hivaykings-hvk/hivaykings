@@ -132,7 +132,7 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
                                 </span>
                             </div>
                         </div>
-                        <div className="text-sm text-gray-500">{timeAgo(new Date(reply.createdAt))}</div>
+                        <div className="text-sm text-gray-500">{timeAgo(reply.createdAt)}</div>
                     </div>
 
                     {/* Content */}
@@ -198,7 +198,7 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
                                     {reply.user.title}
                                 </span>
                             </div>
-                            <span className="text-sm text-gray-500">{timeAgo(new Date(reply.createdAt))}</span>
+                            <span className="text-sm text-gray-500">{timeAgo(reply.createdAt)}</span>
                         </div>
                         <div className="text-gray-700">{parse(reply.content)}</div>
                         <div className="mt-2 flex items-center gap-4">

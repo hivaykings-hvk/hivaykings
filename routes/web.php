@@ -15,6 +15,7 @@ use App\Http\Controllers\RoadRatingController;
 use App\Http\Controllers\QuestionDetailController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\TravelogueController;
+use App\Http\Controllers\SearchController;
 
 Route::get('/', function () {
     return Inertia::render('home');
@@ -94,6 +95,10 @@ Route::get('/hvk-chowk', function (Request $request) {
     ]);
 })->name('hvk-chowk');
 
+Route::get('/hvk-chowk/question/search', function () {
+    return Inertia::render('HvkChowk/QuestionSearch');
+})->name('question.search');
+
 Route::get('/hvk-chowk/question/{id}', [QuestionDetailController::class, 'show'])->name('question.show');
 
 // Road Ratings Routes
@@ -131,6 +136,11 @@ Route::get('/api/questions', [QuestionsController::class, 'index']);
 Route::post('/api/questions', [QuestionsController::class, 'store']);
 Route::get('/api/questions/{id}', [QuestionsController::class, 'show']);
 Route::post('/api/questions/{id}/like', [QuestionsController::class, 'like']);
+
+// Search API Routes
+Route::get('/api/search', [SearchController::class, 'search']);
+Route::get('/api/search/road-ratings', [SearchController::class, 'searchRoadRatings']);
+Route::get('/api/search/chief-reply', [SearchController::class, 'getChiefReply']);
 
 // Question Replies API Routes
 Route::get('/api/questions/{questionId}/replies', [QuestionCommentController::class, 'getReplies']);

@@ -6,6 +6,7 @@ import React from 'react';
 import { FaRegComment, FaRegHeart } from 'react-icons/fa';
 import ShareButton from '../share-button';
 import UserAvatar from '../UserAvatar';
+import { getProcessedDescription } from '@/lib/html-truncate-util';
 
 // Define a minimal User interface for the AskHVKCard, matching the API response
 interface UserForCard {
@@ -38,51 +39,6 @@ const AskHVKCard: React.FC<AskHVKCardProps> = ({ question, stats }) => {
 
     const userImage = question.user?.image || `${process.env.NEXT_PUBLIC_OCI_BUCKET_BASE_URL}default-avatar.webp`; // Fallback for user image
     const userName = `${question.user?.firstName} ${question.user?.lastName}`;
-
-    const getProcessedDescription = (htmlContent: string, maxLength: number = 100) => {
-        if (!htmlContent) {
-            return '';
-        }
-
-        let firstParagraphContent: string | null = null;
-
-        // Function to extract text from children nodes
-        const extractText = (node: DOMNode): string => {
-            if (node.type === 'text') {
-                return (node as Text).data;
-            }
-            if (node instanceof Element) {
-                return Array.from(node.children)
-                    .map((child) => extractText(child as DOMNode))
-                    .join('');
-            }
-            return '';
-        };
-
-        parse(htmlContent, {
-            replace: (domNode) => {
-                if (domNode instanceof Element && domNode.name === 'p' && firstParagraphContent === null) {
-                    firstParagraphContent = Array.from(domNode.children)
-                        .map((child) => extractText(child as DOMNode))
-                        .join('');
-                    // Return null for this node, as we will construct the final <p> element outside parse
-                    return null;
-                }
-                // Once the first paragraph is found, or if it's not a paragraph, discard it
-                return null;
-            },
-        });
-
-        if (firstParagraphContent !== null) {
-            let paragraphText: string = firstParagraphContent; // Explicitly type as string
-            if (paragraphText.length > maxLength) {
-                paragraphText = paragraphText.substring(0, maxLength) + '...';
-            }
-            return paragraphText;
-        }
-
-        return ''; // Return an empty paragraph if no paragraph is found
-    };
 
     return (
         <div className="m-6 mx-auto rounded-lg border-l-4 border-blue-500 bg-white p-4 shadow-lg">
