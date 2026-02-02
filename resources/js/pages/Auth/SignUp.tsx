@@ -4,37 +4,53 @@ import ImagePickerAndPreview from '@/Components/ImagePickerAndPreview';
 import Link from '@/Components/Link';
 import { Button } from '@/Components/ui/button';
 import { Checkbox } from '@/Components/ui/checkbox';
+import { Combobox, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList, ComboboxPopup } from '@/Components/ui/combobox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
 import { Input } from '@/Components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
 import RootLayout from '@/Layouts/RootLayout';
 import { signupFormSchema, SignupFormSchema } from '@/types/auth-schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';
-import { useState } from 'react';
+import { City, Country, State } from 'country-state-city';
+import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { CgSpinner } from 'react-icons/cg';
 import { FaCalendarDays, FaMapLocationDot, FaRegEye, FaRegEyeSlash, FaRoad, FaUserPlus, FaUsers } from 'react-icons/fa6';
 import { toast } from 'sonner';
-
-const STATES = [
-    { value: 'maharashtra', label: 'Maharashtra' },
-    { value: 'delhi', label: 'Delhi' },
-    { value: 'west-bengal', label: 'West Bengal' },
-    { value: 'kerala', label: 'Kerala' },
-];
-
-const COUNTRIES = [
-    { value: 'india', label: 'India' },
-    { value: 'usa', label: 'USA' },
-    { value: 'uk', label: 'United Kingdom' },
-];
 
 function SignUpForm() {
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState<File | undefined>();
+    const [selectedCountry, setSelectedCountry] = useState<string>('');
+    const [selectedState, setSelectedState] = useState<string>('');
+
+    const countries = useMemo(() => {
+        const countryList = Country.getAllCountries().map((country) => ({
+            label: country.name,
+            value: country.isoCode,
+        }));
+        return [...countryList, { label: 'Other', value: 'OTHER' }];
+    }, []);
+
+    const states = useMemo(() => {
+        if (!selectedCountry) return [];
+        const stateList = State.getStatesOfCountry(selectedCountry).map((state) => ({
+            label: state.name,
+            value: state.isoCode,
+        }));
+        return [...stateList, { label: 'Other', value: 'OTHER' }];
+    }, [selectedCountry]);
+
+    const cities = useMemo(() => {
+        if (!selectedCountry || !selectedState) return [];
+        const cityList = City.getCitiesOfState(selectedCountry, selectedState).map((city) => ({
+            label: city.name,
+            value: city.name,
+        }));
+        return [...cityList, { label: 'Other', value: 'OTHER' }];
+    }, [selectedCountry, selectedState]);
 
     const form = useForm<SignupFormSchema>({
         resolver: zodResolver(signupFormSchema),
@@ -184,12 +200,7 @@ function SignUpForm() {
                                         <FormItem>
                                             <FormLabel>First Name</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    className="px-4 sm:px-6"
-                                                    placeholder="Enter your first name"
-                                                    autoComplete="given-name"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="Enter your first name" autoComplete="given-name" {...field} />
                                             </FormControl>
                                             <FormMessage className="text-red-400" />
                                         </FormItem>
@@ -202,12 +213,7 @@ function SignUpForm() {
                                         <FormItem>
                                             <FormLabel>Last Name</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    className="px-4 sm:px-6"
-                                                    placeholder="Enter your last name"
-                                                    autoComplete="family-name"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="Enter your last name" autoComplete="family-name" {...field} />
                                             </FormControl>
                                             <FormMessage className="text-red-400" />
                                         </FormItem>
@@ -224,12 +230,7 @@ function SignUpForm() {
                                         <FormItem>
                                             <FormLabel>Username</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    className="px-4 sm:px-6"
-                                                    placeholder="Enter your username"
-                                                    autoComplete="username"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="Enter your username" autoComplete="username" {...field} />
                                             </FormControl>
                                             <FormMessage className="text-red-400" />
                                         </FormItem>
@@ -244,13 +245,7 @@ function SignUpForm() {
                                         <FormItem>
                                             <FormLabel>Email Address</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    className="px-4 sm:px-6"
-                                                    placeholder="Enter your email"
-                                                    autoComplete="email"
-                                                    type="email"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="Enter your email" autoComplete="email" type="email" {...field} />
                                             </FormControl>
                                             <FormMessage className="text-red-400" />
                                         </FormItem>
@@ -265,13 +260,7 @@ function SignUpForm() {
                                         <FormItem>
                                             <FormLabel>Phone Number</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    className="px-4 sm:px-6"
-                                                    placeholder="Enter your phone number"
-                                                    autoComplete="tel"
-                                                    type="tel"
-                                                    {...field}
-                                                />
+                                                <Input placeholder="Enter your phone number" autoComplete="tel" type="tel" {...field} />
                                             </FormControl>
                                             <FormMessage className="text-red-400" />
                                         </FormItem>
@@ -288,7 +277,6 @@ function SignUpForm() {
                                             <FormControl>
                                                 <div className="relative">
                                                     <Input
-                                                        className="px-4 sm:px-6"
                                                         placeholder="Create a strong password"
                                                         autoComplete="new-password"
                                                         type={showPassword ? 'text' : 'password'}
@@ -317,7 +305,6 @@ function SignUpForm() {
                                             <FormControl>
                                                 <div className="relative">
                                                     <Input
-                                                        className="px-4 sm:px-6"
                                                         placeholder="Confirm your password"
                                                         autoComplete="new-password"
                                                         type={showConfirmPassword ? 'text' : 'password'}
@@ -338,20 +325,36 @@ function SignUpForm() {
                                     )}
                                 />
 
-                                {/* City */}
+                                {/* Select Country */}
                                 <FormField
                                     control={form.control}
-                                    name="city"
+                                    name="country"
                                     render={({ field }) => (
-                                        <FormItem className="mb-4 md:mb-0">
-                                            <FormLabel>City</FormLabel>
+                                        <FormItem className="space-y-1">
+                                            <FormLabel>Select Country</FormLabel>
                                             <FormControl>
-                                                <Input
-                                                    className="px-4 sm:px-6"
-                                                    placeholder="Enter your city"
-                                                    autoComplete="address-level2"
-                                                    {...field}
-                                                />
+                                                <Combobox
+                                                    items={countries}
+                                                    onValueChange={(item) => {
+                                                        field.onChange(item.value);
+                                                        setSelectedCountry(item.value);
+                                                        setSelectedState('');
+                                                        form.setValue('state', '');
+                                                        form.setValue('city', '');
+                                                    }}
+                                                >
+                                                    <ComboboxInput aria-label="Select country" placeholder="Search country..." />
+                                                    <ComboboxPopup>
+                                                        <ComboboxEmpty>No country found.</ComboboxEmpty>
+                                                        <ComboboxList>
+                                                            {(item) => (
+                                                                <ComboboxItem key={item.value} value={item}>
+                                                                    {item.label}
+                                                                </ComboboxItem>
+                                                            )}
+                                                        </ComboboxList>
+                                                    </ComboboxPopup>
+                                                </Combobox>
                                             </FormControl>
                                             <FormMessage className="text-red-400" />
                                         </FormItem>
@@ -365,46 +368,64 @@ function SignUpForm() {
                                     render={({ field }) => (
                                         <FormItem className="space-y-1">
                                             <FormLabel>Select State</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger className="w-full px-4 sm:px-6">
-                                                        <SelectValue placeholder="Select your State" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {STATES.map((state) => (
-                                                        <SelectItem key={state.value} value={state.value}>
-                                                            {state.label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                            <FormControl>
+                                                <Combobox
+                                                    items={states}
+                                                    onValueChange={(item) => {
+                                                        field.onChange(item.value);
+                                                        setSelectedState(item.value);
+                                                        form.setValue('city', '');
+                                                    }}
+                                                >
+                                                    <ComboboxInput
+                                                        aria-label="Select state"
+                                                        placeholder="Search state..."
+                                                        disabled={!selectedCountry}
+                                                    />
+                                                    <ComboboxPopup>
+                                                        <ComboboxEmpty>No state found.</ComboboxEmpty>
+                                                        <ComboboxList>
+                                                            {(item) => (
+                                                                <ComboboxItem key={item.value} value={item}>
+                                                                    {item.label}
+                                                                </ComboboxItem>
+                                                            )}
+                                                        </ComboboxList>
+                                                    </ComboboxPopup>
+                                                </Combobox>
+                                            </FormControl>
                                             <FormMessage className="text-red-400" />
                                         </FormItem>
                                     )}
                                 />
 
-                                {/* Select Country */}
+                                {/* Select City */}
                                 <FormField
                                     control={form.control}
-                                    name="country"
+                                    name="city"
                                     render={({ field }) => (
                                         <FormItem className="space-y-1">
-                                            <FormLabel>Select Country</FormLabel>
-                                            <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                                <FormControl>
-                                                    <SelectTrigger className="w-full px-4 sm:px-6">
-                                                        <SelectValue placeholder="Select your Country" />
-                                                    </SelectTrigger>
-                                                </FormControl>
-                                                <SelectContent>
-                                                    {COUNTRIES.map((country) => (
-                                                        <SelectItem key={country.value} value={country.value}>
-                                                            {country.label}
-                                                        </SelectItem>
-                                                    ))}
-                                                </SelectContent>
-                                            </Select>
+                                            <FormLabel>Select City</FormLabel>
+                                            <FormControl>
+                                                <Combobox
+                                                    items={cities}
+                                                    onValueChange={(item) => {
+                                                        field.onChange(item.value);
+                                                    }}
+                                                >
+                                                    <ComboboxInput aria-label="Select city" placeholder="Search city..." disabled={!selectedState} />
+                                                    <ComboboxPopup>
+                                                        <ComboboxEmpty>No city found.</ComboboxEmpty>
+                                                        <ComboboxList>
+                                                            {(item) => (
+                                                                <ComboboxItem key={item.value} value={item}>
+                                                                    {item.label}
+                                                                </ComboboxItem>
+                                                            )}
+                                                        </ComboboxList>
+                                                    </ComboboxPopup>
+                                                </Combobox>
+                                            </FormControl>
                                             <FormMessage className="text-red-400" />
                                         </FormItem>
                                     )}
@@ -418,7 +439,7 @@ function SignUpForm() {
                                         <FormItem>
                                             <FormLabel>Pincode</FormLabel>
                                             <FormControl>
-                                                <Input className="px-4 sm:px-6" placeholder="Enter your pincode" {...field} />
+                                                <Input placeholder="Enter your pincode" {...field} />
                                             </FormControl>
                                             <FormMessage className="text-red-400" />
                                         </FormItem>
