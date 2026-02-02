@@ -157,6 +157,11 @@ class QuestionCommentController extends Controller
             'likes_count' => 0,
         ]);
 
+        // Increment the comments count on the question (only for top-level comments)
+        if (!isset($validated['parentId']) || !$validated['parentId']) {
+            $question->increment('comments_count');
+        }
+
         $reply->load('user');
 
         return response()->json(

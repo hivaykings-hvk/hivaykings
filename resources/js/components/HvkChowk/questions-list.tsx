@@ -78,11 +78,7 @@ const QuestionsList = () => {
     return (
         <>
             {allQuestions.map((question) => (
-                <AskHvkCard
-                    key={question.id}
-                    question={question}
-                    stats={{ views: 156, replies: 12 }} // Dummy stats for now, can be fetched later
-                />
+                <AskHvkCard key={question.id} question={question} stats={{ views: question.views, replies: question.commentsCount }} />
             ))}
             <div ref={observerTarget} className="h-1" /> {/* Invisible target for observer */}
             {isFetchingNextPage && <LoadingSpinner />}

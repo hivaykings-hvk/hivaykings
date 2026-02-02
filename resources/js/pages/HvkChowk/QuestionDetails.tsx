@@ -2,7 +2,6 @@ import LikeButton from '@/Components/HvkChowk/question-details/like-button';
 import RepliesContainer from '@/Components/HvkChowk/question-details/replies-container';
 import ReplyForm from '@/Components/HvkChowk/question-details/reply-form';
 import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import UserAvatar from '@/Components/UserAvatar';
 import RootLayout from '@/Layouts/RootLayout';
 import { timeAgo } from '@/lib/time-functions';
@@ -27,6 +26,7 @@ interface QuestionDetailsProps {
         category?: string;
         viewsCount: number;
         likesCount: number;
+        isLiked?: boolean;
         createdAt: string;
         user: {
             id: string | number;
@@ -125,7 +125,12 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
                                                 {totalReplies} <span className="hidden sm:inline">replies</span>
                                             </span>
                                         </div>
-                                        <LikeButton initialLikesCount={question.likesCount} questionId={question.id} user={user} />
+                                        <LikeButton
+                                            initialLikesCount={question.likesCount}
+                                            questionId={question.id}
+                                            user={user}
+                                            initialIsLiked={question.isLiked}
+                                        />
                                         <div className="flex items-center gap-2">
                                             <FaClock className="h-4 w-4" />
                                             <span>{timeAgo(question.createdAt)}</span>
@@ -137,7 +142,11 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
                                     {/* Header */}
                                     <div className="mb-4 flex items-center justify-between">
                                         <div className="flex items-center gap-3">
-                                            <UserAvatar imageUrl={question.user?.image} firstName={question.user?.firstName} lastName={question.user?.lastName} />
+                                            <UserAvatar
+                                                imageUrl={question.user?.image}
+                                                firstName={question.user?.firstName}
+                                                lastName={question.user?.lastName}
+                                            />
                                             <div>
                                                 <div className="font-semibold text-gray-800">
                                                     {question.user?.firstName} {question.user?.lastName}
@@ -151,7 +160,7 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
                                                 </span>
                                             </div>
                                         </div>
-                                        <div className="text-sm text-gray-500">{timeAgo(new Date(question.createdAt))}</div>
+                                        <div className="text-sm text-gray-500">{timeAgo(question.createdAt)}</div>
                                     </div>
 
                                     {/* Content */}

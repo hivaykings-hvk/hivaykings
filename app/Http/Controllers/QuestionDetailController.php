@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Question;
+use App\Models\QuestionLike;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 
 class QuestionDetailController extends Controller
@@ -18,6 +20,15 @@ class QuestionDetailController extends Controller
         // Get reply count - count only top-level replies (no parent_id)
         $totalReplies = $question->comments()->whereNull('parent_id')->count();
 
+        // Check if current user has liked this question
+        $isLiked = false;
+        $userId = Auth::id();
+        if ($userId) {
+            $isLiked = QuestionLike::where('question_id', $question->id)
+                ->where('user_id', $userId)
+                ->exists();
+        }
+
         return Inertia::render('HvkChowk/QuestionDetails', [
             'question' => [
                 'id' => $question->id,
@@ -29,6 +40,7 @@ class QuestionDetailController extends Controller
                 'category' => null,
                 'viewsCount' => $question->views,
                 'likesCount' => $question->likes_count,
+                'isLiked' => $isLiked,
                 'createdAt' => $question->created_at,
                 'user' => [
                     'id' => $question->user->id,

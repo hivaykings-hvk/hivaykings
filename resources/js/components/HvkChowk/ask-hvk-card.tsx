@@ -1,12 +1,15 @@
 import { Question as BaseQuestion } from '@/entity/question.entity'; // Rename original Question
+import { useAuth } from '@/hooks/useAuth';
+import { getProcessedDescription } from '@/lib/html-truncate-util';
 import { timeAgo } from '@/lib/time-functions';
 import { titleColorMap } from '@/lib/title-color-map';
-import parse, { DOMNode, Element, Text } from 'html-react-parser';
-import React from 'react';
-import { FaRegComment, FaRegHeart } from 'react-icons/fa';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import axios from 'axios';
+import React, { useState } from 'react';
+import { FaHeart, FaRegComment, FaRegHeart } from 'react-icons/fa';
+import { toast } from 'sonner';
 import ShareButton from '../share-button';
 import UserAvatar from '../UserAvatar';
-import { getProcessedDescription } from '@/lib/html-truncate-util';
 
 // Define a minimal User interface for the AskHVKCard, matching the API response
 interface UserForCard {
@@ -34,6 +37,76 @@ interface AskHVKCardProps {
 
 const AskHVKCard: React.FC<AskHVKCardProps> = ({ question, stats }) => {
     console.log('Rendering AskHVKCard with question:', question);
+    const { user } = useAuth();
+    const queryClient = useQueryClient();
+    const [likesCount, setLikesCount] = useState(question.likesCount || 0);
+    const [isLiked, setIsLiked] = useState(question.isLiked || false);
+
+    const getCsrfToken = () => {
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        return token || '';
+    };
+
+    const likeMutation = useMutation({
+        mutationFn: async () => {
+            const response = await axios.post(
+                `/api/questions/${question.id}/like`,
+                {},
+                {
+                    headers: {
+                        'X-CSRF-Token': getCsrfToken(),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                },
+            );
+            return response.data;
+        },
+        onMutate: async () => {
+            const previousLikesCount = likesCount;
+            const previousIsLiked = isLiked;
+
+            // Optimistic update
+            setLikesCount((prev) => (isLiked ? prev - 1 : prev + 1));
+            setIsLiked(!isLiked);
+
+            return { previousLikesCount, previousIsLiked };
+        },
+        onSuccess: (data) => {
+            setLikesCount(data.likesCount);
+            setIsLiked(data.isLiked);
+            toast.success(data.isLiked ? 'Question liked!' : 'Question unliked!');
+
+            // Invalidate queries to ensure consistency across components
+            queryClient.invalidateQueries({ queryKey: ['questions'], exact: false });
+        },
+        onError: (error: any, variables, context) => {
+            // Rollback on error
+            if (context) {
+                setLikesCount(context.previousLikesCount);
+                setIsLiked(context.previousIsLiked);
+            }
+            console.error('Error liking question:', error);
+            if (error.response?.status === 422) {
+                const errors = error.response?.data?.errors;
+                if (errors) {
+                    Object.values(errors).forEach((err: any) => {
+                        toast.error(Array.isArray(err) ? err[0] : err);
+                    });
+                }
+            } else {
+                toast.error('Failed to like question');
+            }
+        },
+    });
+
+    const handleLike = () => {
+        if (!user) {
+            toast.error('Please login to like question or reply');
+            return;
+        }
+        likeMutation.mutate();
+    };
+
     const tags = question.hashtags ? question.hashtags.split(/\s+/).filter((tag) => tag.length > 0) : [];
     const fromToLocation = question.fromCity && question.toCity ? `${question.fromCity} → ${question.toCity}` : '';
 
@@ -82,10 +155,14 @@ const AskHVKCard: React.FC<AskHVKCardProps> = ({ question, stats }) => {
                     </div>
 
                     <div className="flex flex-wrap items-center gap-6 text-gray-600">
-                        <div className="flex items-center space-x-1">
-                            <FaRegHeart className="h-4 w-4" />
-                            <span>0 likes</span>
-                        </div>
+                        <button
+                            onClick={handleLike}
+                            disabled={likeMutation.isPending}
+                            className="flex items-center space-x-1 transition-colors hover:text-red-500 disabled:opacity-50"
+                        >
+                            {isLiked ? <FaHeart className="h-4 w-4 text-red-500" /> : <FaRegHeart className="h-4 w-4" />}
+                            <span>{likesCount} likes</span>
+                        </button>
                         <div className="flex items-center space-x-1">
                             <FaRegComment className="h-4 w-4" />
                             <span>{stats.replies} replies</span>
