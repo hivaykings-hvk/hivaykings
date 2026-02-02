@@ -156,10 +156,10 @@ const RoadRatingInputForm: React.FC<RoadRatingInputFormProps> = ({ roadRatingId 
                     <button
                         onClick={handleSubmit}
                         disabled={isPending}
-                        className="mt-12 flex items-center gap-2 bg-white text-gray-800 hover:bg-white"
+                        className="mt-12 flex items-center gap-2 bg-white text-gray-800 hover:cursor-pointer hover:bg-white"
                     >
                         <Plus className="h-6 w-6 font-semibold text-gray-800" />
-                        <span className="text-md font-semibold hover:cursor-pointer">Add Your Rating</span>
+                        <span className="text-md font-semibold">Submit Your Rating</span>
                     </button>
                 </div>
             </div>

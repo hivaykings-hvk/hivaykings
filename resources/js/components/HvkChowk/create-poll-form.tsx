@@ -78,7 +78,7 @@ export function CreatePollForm({ user }: CreatePollFormProps) {
         name: 'pollOptions',
     });
 
-    const MAX_OPTIONS = 4;
+    const MAX_OPTIONS = 12;
 
     const handleAddOption = () => {
         if (fields.length < MAX_OPTIONS) {
@@ -150,11 +150,11 @@ export function CreatePollForm({ user }: CreatePollFormProps) {
                 case '1_day':
                     now.setDate(now.getDate() + 1);
                     break;
-                case '3_days':
-                    now.setDate(now.getDate() + 3);
-                    break;
                 case '7_days':
                     now.setDate(now.getDate() + 7);
+                    break;
+                case '30_days':
+                    now.setDate(now.getDate() + 30);
                     break;
             }
             return now.toISOString();
