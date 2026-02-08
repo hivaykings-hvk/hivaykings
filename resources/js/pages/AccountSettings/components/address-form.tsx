@@ -1,11 +1,13 @@
 'use client';
 import { Button } from '@/Components/ui/button';
+import { Combobox, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList, ComboboxPopup } from '@/Components/ui/combobox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
 import { Input } from '@/Components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import React from 'react';
+import { City, Country, State } from 'country-state-city';
+import React, { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { CgSpinner } from 'react-icons/cg';
 import { FiMapPin, FiSave } from 'react-icons/fi';
@@ -26,13 +28,69 @@ interface AddressFormProps {
 }
 export function AddressForm({ user }: AddressFormProps) {
     const queryClient = useQueryClient();
+    const [selectedCountry, setSelectedCountry] = React.useState<string>(user?.country || '');
+    const [selectedState, setSelectedState] = React.useState<string>(user?.state || '');
+    const [selectedCity, setSelectedCity] = React.useState<string>(user?.city || '');
+    const [countryInput, setCountryInput] = React.useState<string>('');
+    const [stateInput, setStateInput] = React.useState<string>('');
+    const [cityInput, setCityInput] = React.useState<string>('');
+
+    const countries = useMemo(() => {
+        const countryList = Country.getAllCountries().map((country) => ({
+            label: country.name,
+            value: country.isoCode,
+        }));
+        return [...countryList, { label: 'Other', value: 'OTHER' }];
+    }, []);
+
+    const states = useMemo(() => {
+        if (!selectedCountry) return [];
+        const stateList = State.getStatesOfCountry(selectedCountry).map((state) => ({
+            label: state.name,
+            value: state.isoCode,
+        }));
+        return [...stateList, { label: 'Other', value: 'OTHER' }];
+    }, [selectedCountry]);
+
+    const cities = useMemo(() => {
+        if (!selectedCountry || !selectedState) return [];
+        const cityList = City.getCitiesOfState(selectedCountry, selectedState).map((city) => ({
+            label: city.name,
+            value: city.name,
+        }));
+        return [...cityList, { label: 'Other', value: 'OTHER' }];
+    }, [selectedCountry, selectedState]);
+
+    // Get labels for display
+    const selectedCountryLabel = useMemo(() => {
+        return countries.find((c) => c.value === selectedCountry)?.label || '';
+    }, [countries, selectedCountry]);
+
+    const selectedStateLabel = useMemo(() => {
+        return states.find((s) => s.value === selectedState)?.label || '';
+    }, [states, selectedState]);
+
+    const selectedCityLabel = useMemo(() => {
+        return cities.find((c) => c.value === selectedCity)?.label || '';
+    }, [cities, selectedCity]);
+
     const form = useForm<AddressFormData>({
         resolver: zodResolver(addressSchema),
         defaultValues: { city: user?.city || '', state: user?.state || '', country: user?.country || '', pincode: user?.pincode || '' },
     });
+
     React.useEffect(() => {
+        if (user?.country) {
+            setSelectedCountry(user.country);
+        }
+        if (user?.state) {
+            setSelectedState(user.state);
+        }
+        if (user?.city) {
+            setSelectedCity(user.city);
+        }
         form.reset({ city: user?.city || '', state: user?.state || '', country: user?.country || '', pincode: user?.pincode || '' });
-    }, [user.id, form]);
+    }, [user?.country, user?.state, user?.city, user?.pincode, form]);
     const updateAddressMutation = useMutation<any, Error, AddressFormData, AddressMutationContext>({
         mutationFn: async (data) => {
             const response = await axios.put('/api/user/profile', {
@@ -87,49 +145,149 @@ export function AddressForm({ user }: AddressFormProps) {
                     <p className="mb-6 text-sm text-slate-600 dark:text-slate-400"> Update your address and location details </p>{' '}
                 </div>{' '}
                 <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    {' '}
-                    {/* City */}{' '}
-                    <FormField
-                        control={form.control}
-                        name="city"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>City</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="New York" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    {/* State/Province */}
-                    <FormField
-                        control={form.control}
-                        name="state"
-                        render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>State / Province</FormLabel>
-                                <FormControl>
-                                    <Input placeholder="New York" {...field} />
-                                </FormControl>
-                                <FormMessage />
-                            </FormItem>
-                        )}
-                    />
                     {/* Country */}
                     <FormField
                         control={form.control}
                         name="country"
                         render={({ field }) => (
-                            <FormItem>
-                                <FormLabel>Country</FormLabel>
+                            <FormItem className="space-y-1">
+                                <FormLabel>Select Country</FormLabel>
                                 <FormControl>
-                                    <Input placeholder="United States" {...field} />
+                                    <Combobox
+                                        items={countries}
+                                        onValueChange={(item) => {
+                                            field.onChange(item.value);
+                                            setSelectedCountry(item.value);
+                                            setCountryInput(item.label);
+                                            setSelectedState('');
+                                            setSelectedCity('');
+                                            setStateInput('');
+                                            setCityInput('');
+                                            form.setValue('state', '');
+                                            form.setValue('city', '');
+                                        }}
+                                    >
+                                        <ComboboxInput
+                                            aria-label="Select country"
+                                            placeholder="Search country..."
+                                            value={countryInput || selectedCountryLabel}
+                                            onChange={(e) => setCountryInput(e.target.value)}
+                                            onBlur={() => {
+                                                if (!countryInput && selectedCountry) {
+                                                    setCountryInput(selectedCountryLabel);
+                                                }
+                                            }}
+                                        />
+                                        <ComboboxPopup>
+                                            <ComboboxEmpty>No country found.</ComboboxEmpty>
+                                            <ComboboxList>
+                                                {(item) => (
+                                                    <ComboboxItem key={item.value} value={item}>
+                                                        {item.label}
+                                                    </ComboboxItem>
+                                                )}
+                                            </ComboboxList>
+                                        </ComboboxPopup>
+                                    </Combobox>
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage className="text-red-400" />
                             </FormItem>
                         )}
                     />
+
+                    {/* State */}
+                    <FormField
+                        control={form.control}
+                        name="state"
+                        render={({ field }) => (
+                            <FormItem className="space-y-1">
+                                <FormLabel>Select State</FormLabel>
+                                <FormControl>
+                                    <Combobox
+                                        items={states}
+                                        onValueChange={(item) => {
+                                            field.onChange(item.value);
+                                            setSelectedState(item.value);
+                                            setStateInput(item.label);
+                                            setSelectedCity('');
+                                            setCityInput('');
+                                            form.setValue('city', '');
+                                        }}
+                                    >
+                                        <ComboboxInput
+                                            aria-label="Select state"
+                                            placeholder="Search state..."
+                                            disabled={!selectedCountry}
+                                            value={stateInput || selectedStateLabel}
+                                            onChange={(e) => setStateInput(e.target.value)}
+                                            onBlur={() => {
+                                                if (!stateInput && selectedState) {
+                                                    setStateInput(selectedStateLabel);
+                                                }
+                                            }}
+                                        />
+                                        <ComboboxPopup>
+                                            <ComboboxEmpty>No state found.</ComboboxEmpty>
+                                            <ComboboxList>
+                                                {(item) => (
+                                                    <ComboboxItem key={item.value} value={item}>
+                                                        {item.label}
+                                                    </ComboboxItem>
+                                                )}
+                                            </ComboboxList>
+                                        </ComboboxPopup>
+                                    </Combobox>
+                                </FormControl>
+                                <FormMessage className="text-red-400" />
+                            </FormItem>
+                        )}
+                    />
+
+                    {/* City */}
+                    <FormField
+                        control={form.control}
+                        name="city"
+                        render={({ field }) => (
+                            <FormItem className="space-y-1">
+                                <FormLabel>Select City</FormLabel>
+                                <FormControl>
+                                    <Combobox
+                                        items={cities}
+                                        onValueChange={(item) => {
+                                            field.onChange(item.value);
+                                            setSelectedCity(item.value);
+                                            setCityInput(item.label);
+                                        }}
+                                    >
+                                        <ComboboxInput
+                                            aria-label="Select city"
+                                            placeholder="Search city..."
+                                            disabled={!selectedState}
+                                            value={cityInput || selectedCityLabel}
+                                            onChange={(e) => setCityInput(e.target.value)}
+                                            onBlur={() => {
+                                                if (!cityInput && selectedCity) {
+                                                    setCityInput(selectedCityLabel);
+                                                }
+                                            }}
+                                        />
+                                        <ComboboxPopup>
+                                            <ComboboxEmpty>No city found.</ComboboxEmpty>
+                                            <ComboboxList>
+                                                {(item) => (
+                                                    <ComboboxItem key={item.value} value={item}>
+                                                        {item.label}
+                                                    </ComboboxItem>
+                                                )}
+                                            </ComboboxList>
+                                        </ComboboxPopup>
+                                    </Combobox>
+                                </FormControl>
+                                <FormMessage className="text-red-400" />
+                            </FormItem>
+                        )}
+                    />
+
                     {/* Pincode */}
                     <FormField
                         control={form.control}
