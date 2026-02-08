@@ -50,7 +50,7 @@ class FacebookAuthController
             Auth::login($user, true);
         }
 
-        return redirect('/dashboard');
+        return redirect('/account-settings');
     }
 
     private function generateUniqueUsername(string $name): string

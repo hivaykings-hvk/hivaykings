@@ -170,7 +170,7 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
                                         Reply
                                     </button>
                                 ) : (
-                                    <a href={`/login?redirectUrl=${encodeURIComponent(redirectUrl)}`}>
+                                    <a href={`/auth/signin?redirect=${encodeURIComponent(redirectUrl)}`}>
                                         <button className="flex items-center gap-1 text-orange-500 hover:cursor-pointer">
                                             <FaReply className="h-4 w-4" />
                                             Reply
@@ -223,7 +223,7 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
                                     Reply
                                 </button>
                             ) : (
-                                <a href={`/login?redirectUrl=${encodeURIComponent(redirectUrl)}`}>
+                                <a href={`/auth/signin?redirect=${encodeURIComponent(redirectUrl)}`}>
                                     <button className="flex items-center text-sm text-orange-500">
                                         <FaReply className="mr-2 h-4 w-4" />
                                         Reply

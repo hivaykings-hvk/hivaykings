@@ -51,9 +51,9 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::middleware(['auth.redirect'])->group(function () {
-    Route::get('/dashboard', function () {
-        return Inertia::render('dashboard');
-    })->name('dashboard');
+    Route::get('/account-settings', function () {
+        return Inertia::render('AccountSettings');
+    })->name('account-settings');
 });
 
 // API Routes with session support

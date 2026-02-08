@@ -8,6 +8,7 @@ import axios from 'axios';
 import React, { useState } from 'react';
 import { FaHeart, FaRegComment, FaRegHeart } from 'react-icons/fa';
 import { toast } from 'sonner';
+import Link from '../Link';
 import ShareButton from '../share-button';
 import UserAvatar from '../UserAvatar';
 
@@ -158,20 +159,20 @@ const AskHVKCard: React.FC<AskHVKCardProps> = ({ question, stats }) => {
                         <button
                             onClick={handleLike}
                             disabled={likeMutation.isPending}
-                            className="flex items-center space-x-1 transition-colors hover:text-red-500 disabled:opacity-50"
+                            className="flex items-center space-x-1 transition-colors hover:cursor-pointer hover:text-red-500 disabled:opacity-50"
                         >
                             {isLiked ? <FaHeart className="h-4 w-4 text-red-500" /> : <FaRegHeart className="h-4 w-4" />}
                             <span>{likesCount} likes</span>
                         </button>
-                        <div className="flex items-center space-x-1">
+                        <Link href={`/hvk-chowk/question/${question.id}#question-replies`} className="flex items-center space-x-1">
                             <FaRegComment className="h-4 w-4" />
                             <span>{stats.replies} replies</span>
-                        </div>
+                        </Link>
                         <div className="flex items-center space-x-1">
                             <ShareButton
                                 title={question.subject}
                                 text={getProcessedDescription(question.description ?? '', 200)}
-                                url={`/question/${question.id}`}
+                                url={`/hvk-chowk/question/${question.id}`}
                             />
                         </div>
                     </div>

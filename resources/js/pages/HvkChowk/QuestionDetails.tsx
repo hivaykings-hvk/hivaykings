@@ -79,7 +79,7 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
                                 </a>
                             ) : (
                                 <a
-                                    href={`/login?redirectUrl=${encodeURIComponent(fullUrl + '#share-your-reply')}`}
+                                    href={`/auth/signin?redirectUrl=${encodeURIComponent(fullUrl + '#share-your-reply')}`}
                                     className="rounded-xl bg-primary px-3 py-1 text-sm text-gray-800"
                                 >
                                     Reply
@@ -192,7 +192,7 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
                                     </div>
                                 </div>
 
-                                <div className="mt-8">
+                                <div className="mt-8" id="question-replies">
                                     {totalReplies > 0 ? (
                                         <RepliesContainer questionId={question.id} user={user} />
                                     ) : (
@@ -205,7 +205,7 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
                                 ) : (
                                     <div className="mt-8 py-6">
                                         <a
-                                            href={`/login?redirectUrl=${encodeURIComponent(fullUrl)}`}
+                                            href={`/auth/signin?redirectUrl=${encodeURIComponent(fullUrl)}`}
                                             className="rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-gray-800"
                                         >
                                             Share your reply

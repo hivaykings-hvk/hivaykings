@@ -46,7 +46,7 @@ function SignIn({ redirectUrl = '/' }: SignInPageProps) {
             if (response.status === 200) {
                 toast.success('Sign in successful! Redirecting...');
                 setTimeout(() => {
-                    window.location.href = redirectUrl || '/';
+                    window.location.href = redirectUrl || '/account-settings';
                 }, 1000);
             }
         } catch (error: any) {

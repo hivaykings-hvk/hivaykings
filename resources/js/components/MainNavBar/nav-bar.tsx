@@ -52,8 +52,9 @@ const NavBar = () => {
             <FixedNavBarWrapper>
                 <nav className="container mx-auto flex items-center justify-between px-3 py-4">
                     <a href="/" className="z-50 flex items-center gap-2">
-                        <div className="rounded-lg border-2 border-white bg-primary px-3 py-1 text-gray-800">HVK</div>
-                        <div className="text-primary">HiVayKings</div>
+                        {/* <div className="rounded-lg border-2 border-white bg-primary px-3 py-1 text-gray-800">HVK</div>
+                        <div className="text-primary">HiVayKings</div> */}
+                        <img src="/logo.png" alt="HiVayKings Logo" className="h-8 w-auto" />
                     </a>
                     <div className="hidden items-center space-x-8 lg:flex">
                         <ActiveLink href="/">Home</ActiveLink>
@@ -108,8 +109,9 @@ const NavBar = () => {
             <nav className="container mx-auto flex items-center justify-between px-3 py-4">
                 {/* Logo Section */}
                 <a href="/" className="z-50 flex items-center gap-2">
-                    <div className="rounded-lg border-2 border-white bg-primary px-3 py-1 text-gray-800">HVK</div>
-                    <div className="text-primary">HiVayKings</div>
+                    {/* <div className="rounded-lg border-2 border-white bg-primary px-3 py-1 text-gray-800">HVK</div>
+                    <div className="text-primary">HiVayKings</div> */}
+                    <img src="/logo.png" alt="HiVayKings Logo" className="h-8 w-auto" />
                 </a>
 
                 {/* Navigation Links */}

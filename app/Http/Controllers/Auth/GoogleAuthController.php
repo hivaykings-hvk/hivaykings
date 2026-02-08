@@ -25,7 +25,7 @@ class GoogleAuthController extends Controller
 
             if ($existingUser) {
                 Auth::login($existingUser, true);
-                return redirect('/dashboard');
+                return redirect('/account-settings');
             }
 
             // Create new user
@@ -42,7 +42,7 @@ class GoogleAuthController extends Controller
             ]);
 
             Auth::login($newUser, true);
-            return redirect('/dashboard');
+            return redirect('/account-settings');
         } catch (\Exception $e) {
             return redirect('/auth/signin')->with('error', 'Google login failed. Please try again.');
         }
