@@ -151,6 +151,7 @@ Route::get('/api/replies/{parentId}/child-count', [QuestionCommentController::cl
 Route::middleware('auth')->group(function () {
     Route::post('/api/replies', [QuestionCommentController::class, 'store']);
     Route::post('/api/replies/{parentId}/child', [QuestionCommentController::class, 'storeChild']);
+    Route::patch('/api/replies/{commentId}/toggle-pin', [QuestionCommentController::class, 'togglePin']);
 });
 
 // Question Comments API Routes

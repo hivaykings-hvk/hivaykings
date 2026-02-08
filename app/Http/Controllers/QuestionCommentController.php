@@ -20,9 +20,10 @@ class QuestionCommentController extends Controller
         $question = Question::findOrFail($questionId);
 
         // Get top-level replies (no parent_id)
+        // Order by: pinned (desc) first, then by created_at (desc)
         $replies = $question->comments()
             ->whereNull('parent_id')
-            ->orderBy('created_at', 'desc')
+            ->orderByRaw('pinned DESC, created_at DESC')
             ->skip($offset)
             ->take($limit)
             ->with('user')
@@ -47,6 +48,7 @@ class QuestionCommentController extends Controller
                         'content' => $reply->content,
                         'createdAt' => $reply->created_at,
                         'updatedAt' => $reply->updated_at,
+                        'pinned' => (bool) $reply->pinned,
                         'user' => [
                             'id' => $reply->user->id,
                             'firstName' => $reply->user->first_name,
@@ -74,8 +76,9 @@ class QuestionCommentController extends Controller
         $parent = QuestionComment::findOrFail($parentId);
 
         // Get child replies
+        // Order by: pinned (desc) first, then by created_at (desc)
         $replies = $parent->children()
-            ->orderBy('created_at', 'asc')
+            ->orderByRaw('pinned DESC, created_at DESC')
             ->skip($offset)
             ->take($limit)
             ->with('user')
@@ -92,6 +95,7 @@ class QuestionCommentController extends Controller
                         'content' => $reply->content,
                         'createdAt' => $reply->created_at,
                         'updatedAt' => $reply->updated_at,
+                        'pinned' => (bool) $reply->pinned,
                         'user' => [
                             'id' => $reply->user->id,
                             'firstName' => $reply->user->first_name,
@@ -171,6 +175,7 @@ class QuestionCommentController extends Controller
                     'content' => $reply->content,
                     'createdAt' => $reply->created_at,
                     'updatedAt' => $reply->updated_at,
+                    'pinned' => (bool) $reply->pinned,
                     'user' => [
                         'id' => $reply->user->id,
                         'firstName' => $reply->user->first_name,
@@ -233,6 +238,7 @@ class QuestionCommentController extends Controller
                     'content' => $reply->content,
                     'createdAt' => $reply->created_at,
                     'updatedAt' => $reply->updated_at,
+                    'pinned' => (bool) $reply->pinned,
                     'user' => [
                         'id' => $reply->user->id,
                         'firstName' => $reply->user->first_name,
@@ -244,5 +250,32 @@ class QuestionCommentController extends Controller
             ],
             201
         );
+    }
+
+    /**
+     * Toggle pin status for a comment
+     */
+    public function togglePin(Request $request, $commentId)
+    {
+        // Only admins (users with title 'Chief') can pin comments
+        $user = $request->user();
+        if (!$user || $user->title !== 'Chief') {
+            return response()->json(['error' => 'Unauthorized - Only admins can pin comments'], 403);
+        }
+
+        // Find the comment
+        $comment = QuestionComment::findOrFail($commentId);
+
+        // Toggle the pinned status
+        $comment->update(['pinned' => !$comment->pinned]);
+
+        return response()->json([
+            'data' => [
+                'id' => $comment->id,
+                'pinned' => $comment->pinned,
+                'commentId' => $comment->id,
+                'parentId' => $comment->parent_id,
+            ],
+        ]);
     }
 }
