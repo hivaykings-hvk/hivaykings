@@ -10,6 +10,7 @@ import CreatePollForm from './create-poll-form';
 import FilterComponent from './filter-component';
 import PollsList from './polls-list';
 import QuestionsList from './questions-list';
+import { SortProvider } from './sort-context';
 import LoadingSpinner from './spinner';
 
 interface HvkChowkTabsProps {
@@ -24,11 +25,13 @@ interface TabsContentWrapperProps {
 const TabsContentWrapper: React.FC<TabsContentWrapperProps> = ({ activeTab, user }) => {
     return (
         <>
-            <FilterComponent />
-            <Suspense fallback={<LoadingSpinner />}>
-                {activeTab === 'ask-hvk' && <QuestionsList />}
-                {activeTab === 'poll' && <PollsList user={user} />}
-            </Suspense>
+            <SortProvider>
+                <FilterComponent />
+                <Suspense fallback={<LoadingSpinner />}>
+                    {activeTab === 'ask-hvk' && <QuestionsList />}
+                    {activeTab === 'poll' && <PollsList user={user} />}
+                </Suspense>
+            </SortProvider>
         </>
     );
 };

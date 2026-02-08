@@ -4,18 +4,22 @@ import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useEffect, useRef } from 'react';
 import AskHvkCard from './ask-hvk-card';
+import { useSort } from './sort-context';
 import LoadingSpinner from './spinner';
 
-const QUESTIONS_PER_PAGE = 10; // Changed from 1 for better pagination
+const QUESTIONS_PER_PAGE = 10;
 
 const QuestionsList = () => {
+    const { sort } = useSort();
+
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } = useInfiniteQuery({
-        queryKey: ['questions'],
+        queryKey: ['questions', sort],
         queryFn: async ({ pageParam = 0 }) => {
             const response = await axios.get('/api/questions', {
                 params: {
                     offset: pageParam,
                     limit: QUESTIONS_PER_PAGE,
+                    sort: sort,
                 },
             });
             console.log('Full response:', response);

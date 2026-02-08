@@ -13,20 +13,21 @@ class QuestionsController extends Controller
 
     public function index(Request $request)
     {
-        $page = $request->query('page', 1);
+        $offset = $request->query('offset', 0);
         $limit = $request->query('limit', self::QUESTIONS_PER_PAGE);
-        $sort = $request->query('sort', 'latest'); // latest, popular
+        $sort = $request->query('sort', 'trending'); // trending, latest
 
         $query = Question::with(['user']);
 
-        if ($sort === 'popular') {
-            $query->orderBy('likes_count', 'desc')->orderBy('comments_count', 'desc');
-        } else {
+        if ($sort === 'latest') {
+            // Latest: sort by created_at descending
             $query->orderBy('created_at', 'desc');
+        } else {
+            // Trending: sort by comments_count DESC, likes_count DESC, views DESC, created_at DESC
+            $query->orderByRaw('comments_count DESC, likes_count DESC, views DESC, created_at DESC');
         }
 
-        $skip = ($page - 1) * $limit;
-        $questions = $query->skip($skip)->take($limit)->get();
+        $questions = $query->skip($offset)->take($limit)->get();
 
         $userId = Auth::id();
 
