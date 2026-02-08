@@ -230,7 +230,7 @@ const TipTapMenuBar = ({ editor, onImageSelection, menuItems }: TipTapMenuBarPro
 
     return (
         <div className="control-group">
-            <div className="button-group flex gap-3 pt-4 text-gray-500">
+            <div className="button-group flex items-center gap-5 pt-4 text-gray-500">
                 {effectiveMenuItems.some((item) => headingItems.includes(item)) && renderMenuItem('paragraph')}
                 {effectiveMenuItems.includes('bold') && renderMenuItem('bold')}
                 {effectiveMenuItems.includes('italic') && renderMenuItem('italic')}

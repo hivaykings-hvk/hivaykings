@@ -28,7 +28,7 @@ const LinkForm: FC<Props> = ({ onLinkSubmit, onUnLinkSubmit, onLinkFormClick }) 
 
     return (
         <div onClick={onLinkFormClicked} className="relative">
-            <FaLink className="h-3 w-3 cursor-pointer" />
+            <FaLink className="h-5 w-5 cursor-pointer" />
             {showForm && (
                 <div className="absolute top-5 -left-16 z-50 flex items-center rounded bg-white p-1 shadow-md ring-1 ring-gray-300">
                     <input
