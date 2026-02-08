@@ -6,11 +6,12 @@ import ReplyForm from './reply-form';
 interface RootReplyFormProps {
     questionId: string | number;
     user: User | null;
+    onReplySubmitted?: () => void;
 }
 
-export default function RootReplyForm({ questionId, user }: RootReplyFormProps) {
+export default function RootReplyForm({ questionId, user, onReplySubmitted }: RootReplyFormProps) {
     if (user) {
-        return <ReplyForm questionId={String(questionId)} user={user} />;
+        return <ReplyForm questionId={String(questionId)} user={user} onSubmitSuccess={onReplySubmitted} />;
     }
 
     // Show login prompt if not logged in

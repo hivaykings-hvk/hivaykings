@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/ui/button';
 import { User } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -25,14 +25,15 @@ interface Reply {
 interface ReplyListProps {
     questionId: string;
     user: User | null;
+    onReplySubmitted?: () => void;
 }
 
 const REPLIES_PER_PAGE = 10;
 
-export default function ReplyList({ questionId, user }: ReplyListProps) {
+export default function ReplyList({ questionId, user, onReplySubmitted }: ReplyListProps) {
     const [offset, setOffset] = useState(0);
 
-    const { data, isLoading, error, isPreviousData } = useQuery({
+    const { data, isLoading, error, isFetching } = useQuery({
         queryKey: [`/api/questions/${questionId}/replies`],
         queryFn: async () => {
             const response = await axios.get(`/api/questions/${questionId}/replies`, {
@@ -42,7 +43,7 @@ export default function ReplyList({ questionId, user }: ReplyListProps) {
         },
     });
 
-    const { data: moreRepliesData, isPreviousData: isPreviousMoreData } = useQuery({
+    const { data: moreRepliesData, isFetching: isFetchingMore } = useQuery({
         queryKey: [`/api/questions/${questionId}/replies`, offset],
         queryFn: async () => {
             if (offset === 0) return null;
@@ -76,11 +77,18 @@ export default function ReplyList({ questionId, user }: ReplyListProps) {
     return (
         <div className="space-y-4">
             {allReplies.map((reply: Reply) => (
-                <ReplyItem key={reply.id} reply={reply} questionId={questionId} initialChildCount={childCounts[reply.id] || 0} user={user} />
+                <ReplyItem
+                    key={reply.id}
+                    reply={reply}
+                    questionId={questionId}
+                    initialChildCount={childCounts[reply.id] || 0}
+                    user={user}
+                    onReplySubmitted={onReplySubmitted}
+                />
             ))}
             {hasMore && (
-                <Button variant="outline" onClick={handleLoadMore} disabled={isLoading || isPreviousData || isPreviousMoreData} className="w-full">
-                    {isLoading || isPreviousData || isPreviousMoreData ? 'Loading...' : 'Load More Replies'}
+                <Button variant="outline" onClick={handleLoadMore} disabled={isLoading || isFetching || isFetchingMore} className="w-full">
+                    {isLoading || isFetching || isFetchingMore ? 'Loading...' : 'Load More Replies'}
                 </Button>
             )}
         </div>

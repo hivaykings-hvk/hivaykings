@@ -37,11 +37,12 @@ interface ReplyItemProps {
     level?: number;
     initialChildCount: number;
     user: User | null;
+    onReplySubmitted?: () => void;
 }
 
 const CHILD_REPLIES_PER_PAGE = 5;
 
-export function ReplyItem({ reply, questionId, level = 0, initialChildCount, user }: ReplyItemProps) {
+export function ReplyItem({ reply, questionId, level = 0, initialChildCount, user, onReplySubmitted }: ReplyItemProps) {
     const [showReplyForm, setShowReplyForm] = useState(false);
     const [childReplies, setChildReplies] = useState<Reply[]>([]);
     const [childRepliesCount, setChildRepliesCount] = useState<number>(initialChildCount);
@@ -273,6 +274,7 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
                             setShowReplyForm(false);
                             setOpenReplyFormId(null);
                             updateChildCount();
+                            onReplySubmitted?.();
                             if (isChildRepliesLoaded) {
                                 handleLoadChildReplies();
                             }
@@ -292,6 +294,7 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
                                 level={level + 1}
                                 initialChildCount={0}
                                 user={user}
+                                onReplySubmitted={onReplySubmitted}
                             />
                         ))}
                         {hasMore && (

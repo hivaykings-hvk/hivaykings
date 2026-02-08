@@ -44,10 +44,11 @@ interface QuestionDetailsProps {
     };
 }
 
-function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
+function QuestionDetails({ question, totalReplies: initialTotalReplies }: QuestionDetailsProps) {
     const { auth } = usePage().props;
     const user = (auth as any)?.user || null;
     const [fullUrl, setFullUrl] = useState('');
+    const [totalReplies, setTotalReplies] = useState(initialTotalReplies);
     const hashtags = question.hashtags?.split(/\s+/).filter((tag: string) => tag.length > 0) || [];
 
     useEffect(() => {
@@ -55,6 +56,11 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
             setFullUrl(`${window.location.origin}/hvk-chowk/question/${question.id}`);
         }
     }, [question.id]);
+
+    // Update totalReplies when it changes from server
+    useEffect(() => {
+        setTotalReplies(initialTotalReplies);
+    }, [initialTotalReplies]);
 
     const handleBackClick = () => {
         if (typeof window !== 'undefined') {
@@ -206,12 +212,22 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
 
                                 <div className="mt-8" id="question-replies">
                                     {totalReplies > 0 ? (
-                                        <RepliesContainer questionId={String(question.id)} user={user} />
+                                        <RepliesContainer
+                                            questionId={String(question.id)}
+                                            user={user}
+                                            onReplySubmitted={() => setTotalReplies((prev) => prev + 1)}
+                                        />
                                     ) : (
                                         <div className="bg-white py-6">No replies yet. Be the first to reply!</div>
                                     )}
 
-                                    {!openReplyFormId && <RootReplyForm questionId={String(question.id)} user={user} />}
+                                    {!openReplyFormId && (
+                                        <RootReplyForm
+                                            questionId={String(question.id)}
+                                            user={user}
+                                            onReplySubmitted={() => setTotalReplies((prev) => prev + 1)}
+                                        />
+                                    )}
                                 </div>
                             </div>
                             {/** Related Questions section */}

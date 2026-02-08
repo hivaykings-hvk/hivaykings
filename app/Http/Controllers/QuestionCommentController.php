@@ -209,6 +209,9 @@ class QuestionCommentController extends Controller
         // Verify parent reply exists
         $parent = QuestionComment::findOrFail($parentId);
 
+        // Get the question to update reply count
+        $question = Question::findOrFail($validated['questionId']);
+
         // Create child reply
         $reply = QuestionComment::create([
             'question_id' => $validated['questionId'],
@@ -217,6 +220,9 @@ class QuestionCommentController extends Controller
             'content' => $validated['content'],
             'likes_count' => 0,
         ]);
+
+        // Increment the comments count on the question (for child replies too)
+        $question->increment('comments_count');
 
         $reply->load('user');
 
