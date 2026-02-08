@@ -190,6 +190,7 @@ function CreateTravelogueContent() {
                                                     'link',
                                                     'blockquote',
                                                     'image',
+                                                    'iconPicker',
                                                 ]}
                                             />
                                         </div>

@@ -113,7 +113,7 @@ function TravelogueDetailContent() {
                 }}
             >
                 <div className="absolute bottom-0 left-0 z-10 w-full p-8 text-white">
-                    <h1 className="text-4xl leading-tight font-bold md:text-5xl">
+                    <h1 className="text-4xl leading-tight font-normal md:text-5xl">
                         {(() => {
                             const titleWords = travelogue.title.split(' ');
                             const midIndex = Math.ceil(titleWords.length / 2);

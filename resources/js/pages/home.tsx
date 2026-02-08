@@ -1,10 +1,13 @@
-import featuredImage1 from '@/assets/images/featured-image-1.jpg';
-import featuredImage2 from '@/assets/images/featured-image-2.jpg';
-import featuredImage3 from '@/assets/images/featured-image-3.jpg';
 import heroImage from '@/assets/images/hero.png';
 
+import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
+import UserAvatar from '@/Components/UserAvatar';
 import RootLayout from '@/Layouts/RootLayout';
-import React from 'react';
+import { timeAgo } from '@/lib/time-functions';
+import { usePage } from '@inertiajs/react';
+import { useQuery } from '@tanstack/react-query';
+import axios from 'axios';
+import React, { useMemo } from 'react';
 import { FaHeart, FaStar } from 'react-icons/fa';
 import { FaBookOpen, FaComment, FaCompass, FaRoute, FaUserTie } from 'react-icons/fa6'; // Grouped imports for clarity
 
@@ -37,6 +40,85 @@ const features = [
 ];
 
 function Home() {
+    const { auth } = usePage().props;
+    const isLoggedIn = auth?.user;
+
+    const { data: questionsData, isLoading: questionsLoading } = useQuery({
+        queryKey: ['home-questions'],
+        queryFn: async () => {
+            const response = await axios.get('/api/questions', {
+                params: {
+                    offset: 0,
+                    limit: 4,
+                    sort: 'trending',
+                },
+            });
+            return response.data.data || [];
+        },
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 10,
+    });
+
+    const { data: roadRatingsData, isLoading: roadRatingsLoading } = useQuery({
+        queryKey: ['home-road-ratings'],
+        queryFn: async () => {
+            const response = await axios.get('/api/road-ratings', {
+                params: {
+                    page: 1,
+                    limit: 3,
+                },
+            });
+            return response.data.data || [];
+        },
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 10,
+    });
+
+    const { data: roadRatingDetails } = useQuery({
+        queryKey: ['home-road-rating-details', roadRatingsData],
+        queryFn: async () => {
+            if (!roadRatingsData || roadRatingsData.length === 0) return {};
+
+            const detailsMap: any = {};
+            const detailPromises = roadRatingsData.map((rating: any) =>
+                axios
+                    .get(`/api/road-ratings/${rating.id}`)
+                    .then((res) => {
+                        detailsMap[rating.id] = res.data.data;
+                    })
+                    .catch(() => {
+                        detailsMap[rating.id] = null;
+                    }),
+            );
+
+            await Promise.all(detailPromises);
+            return detailsMap;
+        },
+        enabled: Boolean(roadRatingsData && roadRatingsData.length > 0),
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 10,
+    });
+
+    const { data: traveloguesData, isLoading: traveloguesLoading } = useQuery({
+        queryKey: ['home-travelogues'],
+        queryFn: async () => {
+            const response = await axios.get('/api/travelogues', {
+                params: {
+                    skip: 0,
+                    limit: 3,
+                },
+            });
+            return response.data.travelogues || [];
+        },
+        staleTime: 1000 * 60 * 5,
+        gcTime: 1000 * 60 * 10,
+    });
+
+    const questions = useMemo(() => questionsData || [], [questionsData]);
+    const roadRatings = useMemo(() => roadRatingsData || [], [roadRatingsData]);
+    const detailsMap = useMemo(() => roadRatingDetails || {}, [roadRatingDetails]);
+    const travelogues = useMemo(() => traveloguesData || [], [traveloguesData]);
+
     return (
         <>
             {/* <!-- Hero Section --> */}
@@ -52,8 +134,8 @@ function Home() {
                         </h1>
                         <p className="md:text-md mt-8 text-sm text-gray-200">When you travel we travel with you.</p>
                         <div className="mt-16 flex gap-6 md:flex-row">
-                            <a href="/signup" className="text-md rounded-lg bg-primary px-6 py-3 md:text-xl">
-                                Join the Tribe
+                            <a href={isLoggedIn ? '/road-ratings' : '/auth/signup'} className="text-md rounded-lg bg-primary px-6 py-3 md:text-xl">
+                                {isLoggedIn ? 'Explore Roads' : 'Join the Tribe'}
                             </a>
                             <a href="/hvk-chowk" className="text-md rounded-lg border border-primary px-6 py-3 text-primary md:text-xl">
                                 Ask HVK
@@ -98,42 +180,27 @@ function Home() {
                     </p>
                     <div className="mt-8 flex items-center justify-center px-3">
                         <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-2">
-                            <div className="max-w-96 rounded-lg border-l-4 border-primary bg-white py-4 pr-4 pl-8 shadow-sm">
-                                <div className="text-sm text-gray-800">What is the road status between Manali to Kaza?</div>
-                                <div className="mt-4 flex items-center gap-4">
-                                    <div className="flex items-center gap-1">
-                                        <FaComment className="h-3 w-3 text-gray-500" /> <span className="text-xs text-gray-500">12 Answers</span>
+                            {questionsLoading ? (
+                                <div className="col-span-2 text-center text-gray-500">Loading questions...</div>
+                            ) : questions.length > 0 ? (
+                                questions.map((question) => (
+                                    <div
+                                        key={question.id}
+                                        className="max-w-96 rounded-lg border-l-4 border-primary bg-white py-4 pr-4 pl-8 shadow-sm"
+                                    >
+                                        <div className="text-sm text-gray-800">{question.subject}</div>
+                                        <div className="mt-4 flex items-center gap-4">
+                                            <div className="flex items-center gap-1">
+                                                <FaComment className="h-3 w-3 text-gray-500" />{' '}
+                                                <span className="text-xs text-gray-500">{question.commentsCount} Answers</span>
+                                            </div>
+                                            <div className="text-xs text-gray-500">{timeAgo(question.createdAt)}</div>
+                                        </div>
                                     </div>
-                                    <div className="text-xs text-gray-500">3h ago</div>
-                                </div>
-                            </div>
-                            <div className="max-w-96 rounded-lg border-l-4 border-primary bg-white py-4 pr-4 pl-8 shadow-sm">
-                                <div className="text-sm text-gray-800">What is the quickest route to Goa from Mumbai?</div>
-                                <div className="mt-4 flex items-center gap-4">
-                                    <div className="flex items-center gap-1">
-                                        <FaComment className="h-3 w-3 text-gray-500" /> <span className="text-xs text-gray-500">8 Answers</span>
-                                    </div>
-                                    <div className="text-xs text-gray-500">5h ago</div>
-                                </div>
-                            </div>
-                            <div className="max-w-96 rounded-lg border-l-4 border-primary bg-white py-4 pr-4 pl-8 shadow-sm">
-                                <div className="text-sm text-gray-800">Are facilites working on Puruvanchal expressway?</div>
-                                <div className="mt-4 flex items-center gap-4">
-                                    <div className="flex items-center gap-1">
-                                        <FaComment className="h-3 w-3 text-gray-500" /> <span className="text-xs text-gray-500">15 Answers</span>
-                                    </div>
-                                    <div className="text-xs text-gray-500">1d ago</div>
-                                </div>
-                            </div>
-                            <div className="max-w-96 rounded-lg border-l-4 border-primary bg-white py-4 pr-4 pl-8 shadow-sm">
-                                <div className="text-sm text-gray-800">Best dhaba stops between Bangalore and Hyderabad?</div>
-                                <div className="mt-4 flex items-center gap-4">
-                                    <div className="flex items-center gap-1">
-                                        <FaComment className="h-3 w-3 text-gray-500" /> <span className="text-xs text-gray-500">21 Answers</span>
-                                    </div>
-                                    <div className="text-xs text-gray-500">2d ago</div>
-                                </div>
-                            </div>
+                                ))
+                            ) : (
+                                <div className="col-span-2 text-center text-gray-500">No questions available</div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -147,176 +214,112 @@ function Home() {
 
                     <div className="mx-4">
                         <div className="my-6 grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
-                            <div className="w-full rounded-xl border border-none bg-bgLightGray px-6 py-6">
-                                <div className="flex items-start justify-between pt-2">
-                                    <div className="text-md font-medium">Mumbai → Pune Expressway</div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="font-medium text-primary">4.3</div>
-                                        <div className="items-center-gap-1 flex">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col pt-3">
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-zinc-800">Road Condition</div>
-                                        <div className="flex items-center">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-gray-300" />
-                                        </div>
-                                    </div>
+                            {roadRatingsLoading ? (
+                                <div className="col-span-3 text-center text-gray-500">Loading road ratings...</div>
+                            ) : roadRatings.length > 0 ? (
+                                roadRatings.map((rating: any) => {
+                                    const detail = detailsMap[rating.id];
+                                    const communityRating = detail?.communityRating || {};
 
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-zinc-800">Traffic</div>
-                                        <div className="flex items-center">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-gray-300" />
-                                        </div>
-                                    </div>
+                                    return (
+                                        <div key={rating.id} className="w-full rounded-xl border border-none bg-bgLightGray px-6 py-6">
+                                            <div className="flex items-start justify-between pt-2">
+                                                <div className="text-md font-medium">
+                                                    {rating.fromCity} → {rating.toCity}{' '}
+                                                    {rating.highwayNumber ? `(${rating.highwayNumber})` : 'Highway'}
+                                                </div>
+                                                <div className="flex items-center gap-2">
+                                                    <div className="font-medium text-primary">{rating.averageRating?.toFixed(1)}</div>
+                                                    <div className="items-center-gap-1 flex">
+                                                        <FaStar className="h-4 w-4 text-primary" />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="flex flex-col pt-3">
+                                                <div className="flex items-center justify-between pt-2">
+                                                    <div className="text-xs text-zinc-800">Road Condition</div>
+                                                    <div className="flex items-center">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <FaStar
+                                                                key={i}
+                                                                className={`h-4 w-4 ${
+                                                                    i < Math.round(communityRating?.roadCondition || 0)
+                                                                        ? 'text-primary'
+                                                                        : 'text-gray-300'
+                                                                }`}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
 
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-zinc-800">Facilities</div>
-                                        <div className="flex items-center">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-gray-300" />
-                                        </div>
-                                    </div>
+                                                <div className="flex items-center justify-between pt-2">
+                                                    <div className="text-xs text-zinc-800">Traffic</div>
+                                                    <div className="flex items-center">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <FaStar
+                                                                key={i}
+                                                                className={`h-4 w-4 ${
+                                                                    i < Math.round(communityRating?.traffic || 0) ? 'text-primary' : 'text-gray-300'
+                                                                }`}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
 
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-zinc-800">Scenic Value</div>
-                                        <div className="flex items-center">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-gray-300" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                                <div className="flex items-center justify-between pt-2">
+                                                    <div className="text-xs text-zinc-800">Facilities</div>
+                                                    <div className="flex items-center">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <FaStar
+                                                                key={i}
+                                                                className={`h-4 w-4 ${
+                                                                    i < Math.round(communityRating?.facilities || 0)
+                                                                        ? 'text-primary'
+                                                                        : 'text-gray-300'
+                                                                }`}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
 
-                            <div className="w-full rounded-xl border border-none bg-bgLightGray px-6 py-6">
-                                <div className="flex items-start justify-between pt-2">
-                                    <div className="text-md font-medium">Delhi → Chandigarh Expressway</div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="font-medium text-primary">4.3</div>
-                                        <div className="items-center-gap-1 flex">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col pt-3">
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-zinc-800">Road Condition</div>
-                                        <div className="flex items-center">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-gray-300" />
-                                        </div>
-                                    </div>
+                                                <div className="flex items-center justify-between pt-2">
+                                                    <div className="text-xs text-zinc-800">Safety Index</div>
+                                                    <div className="flex items-center">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <FaStar
+                                                                key={i}
+                                                                className={`h-4 w-4 ${
+                                                                    i < Math.round(communityRating?.safetyIndex || 0)
+                                                                        ? 'text-primary'
+                                                                        : 'text-gray-300'
+                                                                }`}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
 
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-zinc-800">Traffic</div>
-                                        <div className="flex items-center">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-gray-300" />
+                                                <div className="flex items-center justify-between pt-2">
+                                                    <div className="text-xs text-zinc-800">Scenic Value</div>
+                                                    <div className="flex items-center">
+                                                        {[...Array(5)].map((_, i) => (
+                                                            <FaStar
+                                                                key={i}
+                                                                className={`h-4 w-4 ${
+                                                                    i < Math.round(communityRating?.scenicValue || 0)
+                                                                        ? 'text-primary'
+                                                                        : 'text-gray-300'
+                                                                }`}
+                                                            />
+                                                        ))}
+                                                    </div>
+                                                </div>
+                                            </div>
                                         </div>
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-zinc-800">Facilities</div>
-                                        <div className="flex items-center">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-gray-300" />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-zinc-800">Scenic Value</div>
-                                        <div className="flex items-center">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-gray-300" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="w-full rounded-xl border border-none bg-bgLightGray px-6 py-6">
-                                <div className="flex items-start justify-between pt-2">
-                                    <div className="text-md font-medium">Bangalore → Goa Highway</div>
-                                    <div className="flex items-center gap-2">
-                                        <div className="font-medium text-primary">4.3</div>
-                                        <div className="items-center-gap-1 flex">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex flex-col pt-3">
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-zinc-800">Road Condition</div>
-                                        <div className="flex items-center">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-gray-300" />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-zinc-800">Traffic</div>
-                                        <div className="flex items-center">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-gray-300" />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-zinc-800">Facilities</div>
-                                        <div className="flex items-center">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-gray-300" />
-                                        </div>
-                                    </div>
-
-                                    <div className="flex items-center justify-between pt-2">
-                                        <div className="text-xs text-zinc-800">Scenic Value</div>
-                                        <div className="flex items-center">
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-primary" />
-                                            <FaStar className="h-4 w-4 text-gray-300" />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                    );
+                                })
+                            ) : (
+                                <div className="col-span-3 text-center text-gray-500">No road ratings available</div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -368,81 +371,47 @@ function Home() {
 
                     <div className="mx-4 flex items-center justify-between pt-10">
                         <div className="grid w-full grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                            <div className="flex h-full w-full flex-col overflow-x-hidden rounded-lg border border-none bg-white shadow-lg">
-                                <div className="min-h-[200px] w-full bg-cover bg-center" style={{ backgroundImage: `url(${featuredImage1})` }}></div>
-                                <div className="my-4 px-4">
-                                    <div className="text-lg font-semibold">Ladakh Diaries: 15 days of pure magic</div>
-                                    <p className="mt-3 text-zinc-600">
-                                        An epic journey through the highest motorable roads in the world, capturing the essence of...
-                                    </p>
-                                    <div className="mt-4 flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-7 w-7 overflow-hidden rounded-full border border-none">
-                                                <img
-                                                    src={`${process.env.NEXT_PUBLIC_OCI_BUCKET_BASE_URL}/f23580cd-21b5-4127-87ee-9d5656584917/e2b205ad-7736-4c58-ac48-91d19d5d6334.webp`}
-                                                    alt=""
-                                                    height={30}
-                                                    width={30}
-                                                />
+                            {traveloguesLoading ? (
+                                <div className="col-span-3 text-center text-gray-500">Loading road stories...</div>
+                            ) : travelogues.length > 0 ? (
+                                travelogues.map((travelogue: any) => {
+                                    const author = `${travelogue.user?.firstName} ${travelogue.user?.lastName}`;
+                                    const image = travelogue.images && travelogue.images.length > 0 ? travelogue.images[0] : null;
+
+                                    return (
+                                        <div
+                                            key={travelogue.id}
+                                            className="flex h-full w-full flex-col overflow-x-hidden rounded-lg border border-none bg-white shadow-lg"
+                                        >
+                                            <div
+                                                className="min-h-[200px] w-full bg-cover bg-center"
+                                                style={{ backgroundImage: `url(${image ? '/storage/' + image : 'placeholder'})` }}
+                                            ></div>
+                                            <div className="my-4 flex-grow px-4">
+                                                <div className="text-lg font-semibold">{travelogue.title}</div>
+                                                <p className="mt-3 text-zinc-600">
+                                                    {travelogue.content?.replace(/<[^>]*>/g, '').substring(0, 100)}...
+                                                </p>
                                             </div>
-                                            <div className="text-sm text-gray-500">AdventureSeeker</div>
-                                        </div>
-                                        <div className="text-medium font-medium text-primary">
-                                            <a href="">Read More</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex h-full w-full flex-col overflow-x-hidden rounded-lg border border-none bg-white shadow-lg">
-                                <div className="min-h-[200px] w-full bg-cover bg-center" style={{ backgroundImage: `url(${featuredImage2})` }}></div>
-                                <div className="my-4 px-4">
-                                    <div className="text-lg font-semibold">Costal Karnataka: Hidden Gems</div>
-                                    <p className="mt-3 text-zinc-600">
-                                        Discovering pristine beaches and winding costal roads that most travelers miss...
-                                    </p>
-                                    <div className="mt-4 flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-7 w-7 overflow-hidden rounded-full border border-none">
-                                                <img
-                                                    src={`${process.env.NEXT_PUBLIC_OCI_BUCKET_BASE_URL}/f23580cd-21b5-4127-87ee-9d5656584917/e2b205ad-7736-4c58-ac48-91d19d5d6334.webp`}
-                                                    alt=""
-                                                    height={30}
-                                                    width={30}
-                                                />
+                                            <div className="mt-4 flex items-center justify-between p-4">
+                                                <div className="flex items-center gap-2">
+                                                    <UserAvatar
+                                                        imageUrl={travelogue.user?.image}
+                                                        firstName={travelogue.user?.firstName}
+                                                        lastName={travelogue.user?.lastName}
+                                                    />
+                                                    <div className="text-sm text-gray-500">{author}</div>
+                                                </div>
+                                                <div className="text-medium font-normal text-primary">
+                                                    <a href={`/travelogue/${travelogue.id}`}>Read More</a>
+                                                </div>
                                             </div>
-                                            <div className="text-sm text-gray-500">CostalExplorer</div>
                                         </div>
-                                        <div className="text-medium font-medium text-primary">
-                                            <a href="">Read More</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div className="flex h-full w-full flex-col overflow-x-hidden rounded-lg border border-none bg-white shadow-lg">
-                                <div className="min-h-[200px] w-full bg-cover bg-center" style={{ backgroundImage: `url(${featuredImage3})` }}></div>
-                                <div className="my-4 px-4">
-                                    <div className="text-lg font-semibold">Rajastan Circuit: Royal Roads</div>
-                                    <p className="mt-3 text-zinc-600">
-                                        A magestic journey through the lands of kings, exploring palaces and desert highways...
-                                    </p>
-                                    <div className="mt-4 flex items-center justify-between">
-                                        <div className="flex items-center gap-2">
-                                            <div className="h-7 w-7 overflow-hidden rounded-full border border-none">
-                                                <img
-                                                    src={`${process.env.NEXT_PUBLIC_OCI_BUCKET_BASE_URL}/f23580cd-21b5-4127-87ee-9d5656584917/e2b205ad-7736-4c58-ac48-91d19d5d6334.webp`}
-                                                    alt=""
-                                                    height={30}
-                                                    width={30}
-                                                />
-                                            </div>
-                                            <div className="text-sm text-gray-500">RoyalRoads</div>
-                                        </div>
-                                        <div className="text-medium font-medium text-primary">
-                                            <a href="">Read More</a>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                                    );
+                                })
+                            ) : (
+                                <div className="col-span-3 text-center text-gray-500">No road stories available</div>
+                            )}
                         </div>
                     </div>
                 </div>
@@ -463,7 +432,11 @@ function Home() {
 }
 
 Home.layout = function (page: React.ReactNode) {
-    return <RootLayout>{page}</RootLayout>;
+    return (
+        <RootLayout>
+            <ReactQueryProvider>{page}</ReactQueryProvider>
+        </RootLayout>
+    );
 };
 
 export default Home;
