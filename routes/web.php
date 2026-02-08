@@ -21,6 +21,10 @@ Route::get('/', function () {
     return Inertia::render('home');
 })->name('home');
 
+Route::get('/about', function () {
+    return Inertia::render('About');
+})->name('about');
+
 // Auth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/auth/signup', function () {

@@ -1,6 +1,8 @@
 import heroImage from '@/assets/images/hero.png';
 
+import hvkPhoto from '@/assets/images/about-us/hvk-image.jpg';
 import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
+import Link from '@/Components/Link';
 import UserAvatar from '@/Components/UserAvatar';
 import RootLayout from '@/Layouts/RootLayout';
 import { timeAgo } from '@/lib/time-functions';
@@ -8,7 +10,7 @@ import { usePage } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import React, { useMemo } from 'react';
-import { FaHeart, FaStar } from 'react-icons/fa';
+import { FaStar } from 'react-icons/fa';
 import { FaBookOpen, FaComment, FaCompass, FaRoute, FaUserTie } from 'react-icons/fa6'; // Grouped imports for clarity
 
 const features = [
@@ -149,7 +151,7 @@ function Home() {
             {/* <!-- Feature section --> */}
             <div className="">
                 <div className="container mx-auto px-4 py-8">
-                    <div className="py-8 text-center text-2xl font-medium text-gray-800">What Makes Us Special</div>
+                    <div className="py-8 text-center text-2xl text-gray-800">What Makes Us Special</div>
                 </div>
 
                 <div className="container mx-auto pb-8">
@@ -328,33 +330,36 @@ function Home() {
 
             {/* Live Road Updates */}
             <div className="bg-grayishBg pt-10 pb-16">
-                <div className="container mx-auto">
-                    <div className="pb-4 text-center text-2xl text-gray-800">Live Road Updates</div>
-                    <div className="mt-8 flex flex-col items-center justify-center gap-6 px-3">
-                        <div className="w-full max-w-3xl rounded-lg border-l-4 border-primary bg-white py-4 pr-4 pl-8 shadow-sm">
-                            <div className="text-md pb-2 text-gray-800">Mumbai-Goa Highway fuel stops?</div>
-                            <p className="text-sm text-gray-600">Looing for clean restrooms and good food options along NH66.</p>
-                            <div className="mt-2 flex items-center gap-4">
-                                <div className="flex items-center gap-1">
-                                    <FaHeart className="h-3 w-3 text-red-500" /> <span className="text-xs text-gray-500">156 Likes</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <FaComment className="h-3 w-3 text-gray-500" /> <span className="text-xs text-gray-500">43 Replies</span>
-                                </div>
-                                <div className="text-xs text-gray-500">4h ago</div>
-                            </div>
+                <div className="mx-auto max-w-6xl">
+                    <h2 className="mb-12 text-center text-2xl font-normal text-gray-800">About HVK</h2>
+                    <div className="flex flex-col items-start gap-8 md:flex-row">
+                        {/* Image */}
+                        <div className="flex h-96 w-full flex-1 items-center justify-center rounded-lg">
+                            <img src={hvkPhoto} alt="HVK Photo" className="h-full w-fit rounded-lg object-cover" />
                         </div>
-                        <div className="w-full max-w-3xl rounded-lg border-l-4 border-green-500 bg-white py-4 pr-4 pl-8 shadow-sm">
-                            <div className="text-md pb-2 text-gray-800">Manali-Leh condition updates?</div>
-                            <p className="text-sm text-gray-600">Heavy snowfall at Rohtang pass, road closed until further notice.</p>
-                            <div className="mt-2 flex items-center gap-4">
-                                <div className="flex items-center gap-1">
-                                    <FaHeart className="h-3 w-3 text-red-500" /> <span className="text-xs text-gray-500">24 Likes</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                    <FaComment className="h-3 w-3 text-gray-500" /> <span className="text-xs text-gray-500">8 Replies</span>
-                                </div>
-                                <div className="text-xs text-gray-500">3h ago</div>
+
+                        {/* Content */}
+                        <div className="flex-1">
+                            <p className="mb-6 text-base text-gray-700">
+                                HV Kumar, born in 1963 in Mumbai, is a qualified Chartered Accountant and Company Secretary with decades of
+                                professional consulting experience. But beyond his corporate credentials lies a passionate road traveler who has
+                                transformed his love for highways into a mission to help fellow travelers.
+                            </p>
+                            <p className="mb-6 text-base text-gray-700">
+                                Since 1986, Kumar has meticulously logged over <span className="font-semibold text-primary">800,000 kilometers</span>{' '}
+                                across Indian roads, documenting routes, fuel stops, road conditions, and scenic spots. His journey began with a
+                                simple love for exploration but evolved into something much greater— becoming India's most trusted "Human GPS."
+                            </p>
+                            <div className="rounded-r-md border-l-4 border-primary bg-gray-50 py-2 pl-4">
+                                <p className="text-gray-800 italic">
+                                    "What started as personal travel logs became a calling to help others navigate India's vast highway network with
+                                    confidence and safety."
+                                </p>
+                            </div>
+                            <div className="mt-3">
+                                <Link href="/about" className="text-primary hover:underline hover:underline-offset-4">
+                                    Learn More
+                                </Link>
                             </div>
                         </div>
                     </div>

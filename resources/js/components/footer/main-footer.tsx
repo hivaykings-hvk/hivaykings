@@ -49,7 +49,7 @@ const Footer = () => {
                         <h3 className="mb-4 text-lg">Community</h3>
                         <ul className="flex flex-col items-center lg:items-start">
                             <li className="mb-2">
-                                <Link href="/aboutus" className="font-light text-gray-300 hover:text-primary">
+                                <Link href="/about" className="font-light text-gray-300 hover:text-primary">
                                     About HVK
                                 </Link>
                             </li>
