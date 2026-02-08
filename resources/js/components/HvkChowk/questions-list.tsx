@@ -6,15 +6,15 @@ import { useEffect, useRef } from 'react';
 import AskHvkCard from './ask-hvk-card';
 import LoadingSpinner from './spinner';
 
-const QUESTIONS_PER_PAGE = 1; //parseInt(process.env.NEXT_PUBLIC_QUESTIONS_PER_PAGE || '1', 1);
+const QUESTIONS_PER_PAGE = 10; // Changed from 1 for better pagination
 
 const QuestionsList = () => {
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading, isError, error } = useInfiniteQuery({
         queryKey: ['questions'],
-        queryFn: async ({ pageParam = 1 }) => {
+        queryFn: async ({ pageParam = 0 }) => {
             const response = await axios.get('/api/questions', {
                 params: {
-                    page: pageParam,
+                    offset: pageParam,
                     limit: QUESTIONS_PER_PAGE,
                 },
             });
@@ -23,15 +23,15 @@ const QuestionsList = () => {
             const questions = response.data.data;
             console.log('Questions extracted:', questions);
             console.log('Questions count:', questions.length);
-            return { questions, nextPage: pageParam + 1 };
+            return { questions, nextOffset: pageParam + QUESTIONS_PER_PAGE };
         },
-        initialPageParam: 1,
+        initialPageParam: 0,
         getNextPageParam: (lastPage) => {
             // If the number of returned questions is less than QUESTIONS_PER_PAGE, it's the last page
             if (lastPage.questions.length < QUESTIONS_PER_PAGE) {
                 return undefined;
             }
-            return lastPage.nextPage;
+            return lastPage.nextOffset;
         },
         staleTime: 1000 * 60 * 5, // 5 minutes
         gcTime: 1000 * 60 * 10, // 10 minutes

@@ -70,21 +70,8 @@ const AskHvkForm = ({ user }: AskHvkFormProps) => {
         },
         onSuccess: (data: QuestionWithUser) => {
             toast.success('Question posted successfully');
-            queryClient.setQueryData(['questions'], (oldData: QuestionsInfiniteQueryData | undefined) => {
-                if (oldData && oldData.pages) {
-                    const newPages = [...oldData.pages];
-                    // Add the new question to the beginning of the first page's questions array
-                    newPages[0] = {
-                        ...newPages[0],
-                        questions: [data, ...newPages[0].questions],
-                    };
-                    return {
-                        ...oldData,
-                        pages: newPages,
-                    };
-                }
-                return oldData;
-            });
+            // Invalidate the entire questions query to refetch fresh data
+            queryClient.invalidateQueries({ queryKey: ['questions'] });
             questionForm.reset();
         },
         onError: (error) => {
