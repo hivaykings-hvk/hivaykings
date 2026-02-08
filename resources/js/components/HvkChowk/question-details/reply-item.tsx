@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/Components/ui/button';
 import UserAvatar from '@/Components/UserAvatar';
 import { timeAgo } from '@/lib/time-functions';
 import { titleColorMap } from '@/lib/title-color-map';
@@ -12,6 +12,7 @@ import { useEffect, useState } from 'react';
 import { FaHeart, FaReply } from 'react-icons/fa';
 import { FaCircleCheck, FaRegComment } from 'react-icons/fa6';
 import ReplyForm from './reply-form';
+import { useReplyFormContext } from './reply-form-context';
 
 const OCI_BUCKET_BASE_URL = import.meta.env.VITE_OCI_BUCKET_BASE_URL || 'https://hvk-chowk.s3.com';
 
@@ -49,6 +50,18 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
     const [hasMore, setHasMore] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [redirectUrl, setRedirectUrl] = useState('');
+    const { openReplyFormId, setOpenReplyFormId } = useReplyFormContext();
+
+    useEffect(() => {
+        // Close this form if another reply form is opened or if root form is activated
+        if (openReplyFormId && openReplyFormId !== reply.id && showReplyForm) {
+            setShowReplyForm(false);
+        }
+        // Also close this form if openReplyFormId is null (user clicked question Reply button)
+        if (openReplyFormId === null && showReplyForm) {
+            setShowReplyForm(false);
+        }
+    }, [openReplyFormId, reply.id, showReplyForm]);
 
     useEffect(() => {
         if (initialChildCount === 0) {
@@ -96,6 +109,15 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
             setOffset(0);
         } else {
             handleLoadChildReplies();
+        }
+    };
+
+    const handleToggleReplyForm = (isOpen: boolean) => {
+        setShowReplyForm(isOpen);
+        if (isOpen) {
+            setOpenReplyFormId(reply.id);
+        } else {
+            setOpenReplyFormId(null);
         }
     };
 
@@ -163,7 +185,7 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
 
                                 {user ? (
                                     <button
-                                        onClick={() => setShowReplyForm(!showReplyForm)}
+                                        onClick={() => handleToggleReplyForm(!showReplyForm)}
                                         className="flex items-center gap-1 text-orange-500 hover:cursor-pointer"
                                     >
                                         <FaReply className="h-4 w-4" />
@@ -218,7 +240,7 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
                             </button>
 
                             {user ? (
-                                <button onClick={() => setShowReplyForm(!showReplyForm)} className="flex items-center text-sm text-orange-500">
+                                <button onClick={() => handleToggleReplyForm(!showReplyForm)} className="flex items-center text-sm text-orange-500">
                                     <FaReply className="mr-2 h-4 w-4" />
                                     Reply
                                 </button>
@@ -249,6 +271,7 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
                         parentId={reply.id}
                         onSubmitSuccess={() => {
                             setShowReplyForm(false);
+                            setOpenReplyFormId(null);
                             updateChildCount();
                             if (isChildRepliesLoaded) {
                                 handleLoadChildReplies();

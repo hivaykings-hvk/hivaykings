@@ -1,7 +1,9 @@
 import LikeButton from '@/Components/HvkChowk/question-details/like-button';
 import RepliesContainer from '@/Components/HvkChowk/question-details/replies-container';
-import ReplyForm from '@/Components/HvkChowk/question-details/reply-form';
+import { ReplyFormProvider, useReplyFormContext } from '@/Components/HvkChowk/question-details/reply-form-context';
+import RootReplyForm from '@/Components/HvkChowk/question-details/root-reply-form';
 import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
+import Link from '@/Components/Link';
 import UserAvatar from '@/Components/UserAvatar';
 import RootLayout from '@/Layouts/RootLayout';
 import { timeAgo } from '@/lib/time-functions';
@@ -60,8 +62,10 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
         }
     };
 
-    return (
-        <ReactQueryProvider>
+    const ContentWithContext = () => {
+        const { openReplyFormId, setOpenReplyFormId } = useReplyFormContext();
+
+        return (
             <div className="bg-gray-50">
                 <div className="container mx-auto">
                     <div className="px-3 py-6">
@@ -119,15 +123,18 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
                                                 {question.viewsCount} <span className="hidden sm:inline">views</span>
                                             </span>
                                         </div>
-                                        <div className="flex items-center gap-2">
+                                        <Link
+                                            href={`/hvk-chowk/question/${question.id}#question-replies`}
+                                            className="flex items-center gap-2 hover:cursor-pointer"
+                                        >
                                             <FaReply className="h-4 w-4" />
                                             <span>
                                                 {totalReplies} <span className="hidden sm:inline">replies</span>
                                             </span>
-                                        </div>
+                                        </Link>
                                         <LikeButton
                                             initialLikesCount={question.likesCount}
-                                            questionId={question.id}
+                                            questionId={String(question.id)}
                                             user={user}
                                             initialIsLiked={question.isLiked}
                                         />
@@ -177,7 +184,12 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
                                                 <FaHeart className="h-4 w-4" />
                                                 <span>0</span>
                                             </div>
-                                            <div className="flex items-center gap-1 text-orange-500">
+                                            <div
+                                                className="flex cursor-pointer items-center gap-1 text-orange-500"
+                                                onClick={() => {
+                                                    setOpenReplyFormId(null);
+                                                }}
+                                            >
                                                 <FaReply className="h-4 w-4" />
                                                 <span>Reply</span>
                                             </div>
@@ -194,24 +206,13 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
 
                                 <div className="mt-8" id="question-replies">
                                     {totalReplies > 0 ? (
-                                        <RepliesContainer questionId={question.id} user={user} />
+                                        <RepliesContainer questionId={String(question.id)} user={user} />
                                     ) : (
                                         <div className="bg-white py-6">No replies yet. Be the first to reply!</div>
                                     )}
-                                </div>
 
-                                {user ? (
-                                    <ReplyForm questionId={question.id} user={user} />
-                                ) : (
-                                    <div className="mt-8 py-6">
-                                        <a
-                                            href={`/auth/signin?redirectUrl=${encodeURIComponent(fullUrl)}`}
-                                            className="rounded-xl bg-primary px-3 py-2 text-sm font-semibold text-gray-800"
-                                        >
-                                            Share your reply
-                                        </a>
-                                    </div>
-                                )}
+                                    {!openReplyFormId && <RootReplyForm questionId={String(question.id)} user={user} />}
+                                </div>
                             </div>
                             {/** Related Questions section */}
                             <div className="h-fit grow-0 rounded-lg bg-white p-6 shadow-xl lg:w-1/4">
@@ -229,6 +230,14 @@ function QuestionDetails({ question, totalReplies }: QuestionDetailsProps) {
                     </div>
                 </div>
             </div>
+        );
+    };
+
+    return (
+        <ReactQueryProvider>
+            <ReplyFormProvider>
+                <ContentWithContext />
+            </ReplyFormProvider>
         </ReactQueryProvider>
     );
 }
