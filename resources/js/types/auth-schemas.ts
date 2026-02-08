@@ -17,6 +17,7 @@ export const signupFormSchema = z
         state: z.string().min(1, { message: 'State is required.' }),
         country: z.string().min(1, { message: 'Country is required.' }).trim(),
         pincode: z.string().min(1, { message: 'Pincode is required.' }).trim(),
+        bio: z.string().optional(),
         image: z.any().optional(),
         agreeTerms: z.boolean().refine((val) => val === true, {
             message: 'You must agree to the terms and conditions.',

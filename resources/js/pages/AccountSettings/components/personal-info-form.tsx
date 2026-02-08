@@ -3,6 +3,7 @@
 import { Button } from '@/Components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
 import { Input } from '@/Components/ui/input';
+import { Textarea } from '@/Components/ui/textarea';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
@@ -23,6 +24,7 @@ const personalInfoSchema = z.object({
     last_name: z.string().min(2, 'Last name must be at least 2 characters'),
     username: z.string().min(3, 'Username must be at least 3 characters').optional().or(z.literal('')),
     phone: z.string().optional().or(z.literal('')),
+    bio: z.string().max(500, 'Bio must be at most 500 characters').optional().or(z.literal('')),
 });
 
 type PersonalInfoFormData = z.infer<typeof personalInfoSchema>;
@@ -44,6 +46,7 @@ export function PersonalInfoForm({ user }: PersonalInfoFormProps) {
             last_name: user?.last_name || '',
             username: user?.username || '',
             phone: user?.phone || '',
+            bio: user?.bio || '',
         },
     });
 
@@ -53,6 +56,7 @@ export function PersonalInfoForm({ user }: PersonalInfoFormProps) {
             last_name: user?.last_name || '',
             username: user?.username || '',
             phone: user?.phone || '',
+            bio: user?.bio || '',
         });
         setSelectedImageFile(null);
         setIsImageChanged(false);
@@ -84,6 +88,7 @@ export function PersonalInfoForm({ user }: PersonalInfoFormProps) {
                 last_name: data.last_name,
                 username: data.username || undefined,
                 phone: data.phone || undefined,
+                bio: data.bio || undefined,
             });
             return response.data;
         },
@@ -99,6 +104,7 @@ export function PersonalInfoForm({ user }: PersonalInfoFormProps) {
                     last_name: newData.last_name,
                     username: newData.username || old.username,
                     phone: newData.phone || old.phone,
+                    bio: newData.bio || old.bio,
                 };
             });
 
@@ -133,6 +139,7 @@ export function PersonalInfoForm({ user }: PersonalInfoFormProps) {
             try {
                 await axios.put('/api/user/profile', {
                     ...data,
+                    bio: data.bio || undefined,
                     image_path: uploadedImagePath,
                 });
                 queryClient.invalidateQueries({ queryKey: ['user'] });
@@ -261,6 +268,26 @@ export function PersonalInfoForm({ user }: PersonalInfoFormProps) {
                     <FormMessage />
                     <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Your email cannot be changed from here</p>
                 </FormItem>
+
+                {/* Bio - About You */}
+                <FormField
+                    control={form.control}
+                    name="bio"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>About You (Bio)</FormLabel>
+                            <FormControl>
+                                <Textarea
+                                    placeholder="Tell us something about yourself (optional)"
+                                    className="flex min-h-[120px] w-full rounded-lg border border-slate-300 bg-slate-100 px-4 py-2 text-slate-600 dark:border-slate-600 dark:bg-slate-800 dark:text-slate-400"
+                                    {...field}
+                                />
+                            </FormControl>
+                            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{field.value?.length || 0}/500 characters</p>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
 
                 {/* Submit Button */}
                 <div className="flex gap-3 pt-4">

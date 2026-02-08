@@ -67,6 +67,7 @@ function SignUpForm() {
             state: '',
             country: '',
             pincode: '',
+            bio: '',
             agreeTerms: false,
             subscribeNewsletter: false,
         },
@@ -97,6 +98,7 @@ function SignUpForm() {
             formData.append('state', values.state);
             formData.append('country', values.country);
             formData.append('pincode', values.pincode);
+            formData.append('bio', values.bio || '');
             formData.append('subscribeNewsletter', values.subscribeNewsletter ? '1' : '0');
 
             if (selectedImage) {
@@ -440,6 +442,25 @@ function SignUpForm() {
                                             <FormLabel>Pincode</FormLabel>
                                             <FormControl>
                                                 <Input placeholder="Enter your pincode" {...field} />
+                                            </FormControl>
+                                            <FormMessage className="text-red-400" />
+                                        </FormItem>
+                                    )}
+                                />
+
+                                {/* Bio - About You */}
+                                <FormField
+                                    control={form.control}
+                                    name="bio"
+                                    render={({ field }) => (
+                                        <FormItem>
+                                            <FormLabel>About You (Bio)</FormLabel>
+                                            <FormControl>
+                                                <textarea
+                                                    placeholder="Tell us something about yourself (optional)"
+                                                    className="flex min-h-[100px] w-full rounded-md border border-input bg-background px-3 py-2 text-base ring-offset-background placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm"
+                                                    {...field}
+                                                />
                                             </FormControl>
                                             <FormMessage className="text-red-400" />
                                         </FormItem>

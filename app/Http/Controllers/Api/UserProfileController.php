@@ -31,6 +31,7 @@ class UserProfileController extends Controller
             'country' => $user->country,
             'pincode' => $user->pincode,
             'image_path' => $user->image_path,
+            'bio' => $user->bio,
             'subscribe_newsletter' => $user->subscribe_newsletter,
         ]);
     }
@@ -52,6 +53,7 @@ class UserProfileController extends Controller
             'state' => 'sometimes|string|nullable',
             'country' => 'sometimes|string|nullable',
             'pincode' => 'sometimes|string|nullable',
+            'bio' => 'sometimes|string|nullable|max:500',
             'image_path' => 'sometimes|string|nullable',
             'subscribe_newsletter' => 'sometimes|boolean',
         ]);
@@ -72,6 +74,7 @@ class UserProfileController extends Controller
                 'country' => $user->country,
                 'pincode' => $user->pincode,
                 'image_path' => $user->image_path,
+                'bio' => $user->bio,
                 'subscribe_newsletter' => $user->subscribe_newsletter,
             ]
         ]);

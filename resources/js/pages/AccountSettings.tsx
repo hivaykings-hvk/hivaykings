@@ -18,6 +18,7 @@ interface UserData {
     country?: string;
     pincode?: string;
     image_path?: string;
+    bio?: string;
     subscribe_newsletter?: boolean;
 }
 

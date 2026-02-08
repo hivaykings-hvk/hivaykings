@@ -29,6 +29,7 @@ class RegisterController extends Controller
             'state' => 'required|string|min:2',
             'country' => 'required|string|min:2',
             'pincode' => 'required|string|min:4',
+            'bio' => 'nullable|string|max:500',
             'image' => 'required|image|mimes:jpeg,jpg,png,webp|max:5120',
             'subscribeNewsletter' => 'boolean',
         ]);
@@ -54,6 +55,7 @@ class RegisterController extends Controller
                 'state' => $validated['state'],
                 'country' => $validated['country'],
                 'pincode' => $validated['pincode'],
+                'bio' => $validated['bio'] ?? null,
                 'password' => Hash::make($validated['password']),
                 'image_path' => $imagePath,
                 'subscribe_newsletter' => $validated['subscribeNewsletter'] ?? false,

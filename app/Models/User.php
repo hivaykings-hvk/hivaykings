@@ -33,6 +33,7 @@ class User extends Authenticatable
         'pincode',
         'password',
         'image_path',
+        'bio',
         'subscribe_newsletter',
         'email_verified_at',
     ];
