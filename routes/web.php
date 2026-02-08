@@ -25,6 +25,10 @@ Route::get('/about', function () {
     return Inertia::render('About');
 })->name('about');
 
+Route::get('/hvk-store', function () {
+    return Inertia::render('Store');
+})->name('hvk-store');
+
 // Auth Routes
 Route::middleware('guest')->group(function () {
     Route::get('/auth/signup', function () {
