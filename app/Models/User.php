@@ -36,6 +36,7 @@ class User extends Authenticatable
         'bio',
         'subscribe_newsletter',
         'email_verified_at',
+        'role',
     ];
 
     /**
@@ -61,5 +62,38 @@ class User extends Authenticatable
             'subscribe_newsletter' => 'boolean',
             'password' => 'hashed',
         ];
+    }
+
+    public function hasRole($role)
+    {
+        if (is_array($role)) {
+            return in_array($this->role, $role);
+        }
+
+        return $this->role === $role;
+    }
+
+    public function hasAnyRole($roles)
+    {
+        return in_array($this->role, (array) $roles);
+    }
+
+    public function hasAllRoles($roles)
+    {
+        return $this->hasRole($roles);
+    }
+
+    public function assignRole($role)
+    {
+        $this->update(['role' => $role]);
+        return $this;
+    }
+
+    public function removeRole($role)
+    {
+        if ($this->role === $role) {
+            $this->update(['role' => 'user']);
+        }
+        return $this;
     }
 }
