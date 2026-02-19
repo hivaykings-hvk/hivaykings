@@ -49,6 +49,7 @@ class QuestionsController extends Controller
                 'views' => $question->views,
                 'likesCount' => $question->likes_count,
                 'commentsCount' => $question->comments_count,
+                'abuseReported' => $question->abuse_reported,
                 'user' => [
                     'id' => $question->user->id,
                     'firstName' => $question->user->first_name,
@@ -103,6 +104,7 @@ class QuestionsController extends Controller
             'views' => $question->views,
             'likesCount' => 0,
             'commentsCount' => 0,
+            'abuseReported' => false,
             'user' => [
                 'id' => $question->user->id,
                 'firstName' => $question->user->first_name,
@@ -142,6 +144,7 @@ class QuestionsController extends Controller
             'views' => $question->views,
             'likesCount' => $question->likes_count,
             'commentsCount' => $question->comments_count,
+            'abuseReported' => $question->abuse_reported,
             'user' => [
                 'id' => $question->user->id,
                 'firstName' => $question->user->first_name,
@@ -188,5 +191,22 @@ class QuestionsController extends Controller
                 'likesCount' => $question->likes_count,
             ]);
         }
+    }
+
+    public function report($id)
+    {
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Please login to report abuse'], 401);
+        }
+
+        $question = Question::findOrFail($id);
+
+        $question->update(['abuse_reported' => true]);
+
+        return response()->json([
+            'questionId' => $id,
+            'report' => true,
+            'message' => 'Question reported successfully',
+        ]);
     }
 }

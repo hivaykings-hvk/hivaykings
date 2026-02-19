@@ -144,6 +144,7 @@ Route::get('/api/questions', [QuestionsController::class, 'index']);
 Route::post('/api/questions', [QuestionsController::class, 'store']);
 Route::get('/api/questions/{id}', [QuestionsController::class, 'show']);
 Route::post('/api/questions/{id}/like', [QuestionsController::class, 'like']);
+Route::post('/api/questions/{id}/report', [QuestionsController::class, 'report']);
 
 // Search API Routes
 Route::get('/api/search', [SearchController::class, 'search']);
@@ -160,6 +161,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/api/replies', [QuestionCommentController::class, 'store']);
     Route::post('/api/replies/{parentId}/child', [QuestionCommentController::class, 'storeChild']);
     Route::patch('/api/replies/{commentId}/toggle-pin', [QuestionCommentController::class, 'togglePin']);
+    Route::post('/api/replies/{commentId}/report', [QuestionCommentController::class, 'report']);
 });
 
 // Question Comments API Routes

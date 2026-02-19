@@ -6,7 +6,7 @@ import { titleColorMap } from '@/lib/title-color-map';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import React, { useState } from 'react';
-import { FaHeart, FaRegComment, FaRegHeart } from 'react-icons/fa';
+import { FaFlag, FaHeart, FaRegComment, FaRegFlag, FaRegHeart } from 'react-icons/fa';
 import { toast } from 'sonner';
 import Link from '../Link';
 import ShareButton from '../share-button';
@@ -42,6 +42,7 @@ const AskHVKCard: React.FC<AskHVKCardProps> = ({ question, stats }) => {
     const queryClient = useQueryClient();
     const [likesCount, setLikesCount] = useState(question.likesCount || 0);
     const [isLiked, setIsLiked] = useState(question.isLiked || false);
+    const [isReported, setIsReported] = useState(question.abuseReported || false);
 
     const getCsrfToken = () => {
         const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
@@ -100,12 +101,74 @@ const AskHVKCard: React.FC<AskHVKCardProps> = ({ question, stats }) => {
         },
     });
 
+    const reportMutation = useMutation({
+        mutationFn: async () => {
+            const response = await axios.post(
+                `/api/questions/${question.id}/report`,
+                {},
+                {
+                    headers: {
+                        'X-CSRF-Token': getCsrfToken(),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                },
+            );
+            return response.data;
+        },
+        onMutate: async () => {
+            const previousReported = isReported;
+
+            // Optimistic update
+            setIsReported(true);
+
+            return { previousReported };
+        },
+        onSuccess: () => {
+            setIsReported(true);
+            toast.success('Question reported successfully. Our team will review it.');
+
+            // Invalidate queries to ensure consistency across components
+            queryClient.invalidateQueries({ queryKey: ['questions'], exact: false });
+        },
+        onError: (error: any, variables, context) => {
+            // Rollback on error
+            if (context) {
+                setIsReported(context.previousReported);
+            }
+            console.error('Error reporting question:', error);
+            if (error.response?.status === 401) {
+                toast.error('Please login to report abuse');
+            } else if (error.response?.status === 422) {
+                const errors = error.response?.data?.errors;
+                if (errors) {
+                    Object.values(errors).forEach((err: any) => {
+                        toast.error(Array.isArray(err) ? err[0] : err);
+                    });
+                }
+            } else {
+                toast.error('Failed to report question. Please try again.');
+            }
+        },
+    });
+
     const handleLike = () => {
         if (!user) {
             toast.error('Please login to like question or reply');
             return;
         }
         likeMutation.mutate();
+    };
+
+    const handleReport = () => {
+        if (!user) {
+            toast.error('Please login to report abuse');
+            return;
+        }
+        if (isReported) {
+            toast.info('You have already reported this question');
+            return;
+        }
+        reportMutation.mutate();
     };
 
     const tags = question.hashtags ? question.hashtags.split(/\s+/).filter((tag) => tag.length > 0) : [];
@@ -175,6 +238,15 @@ const AskHVKCard: React.FC<AskHVKCardProps> = ({ question, stats }) => {
                                 url={`/hvk-chowk/question/${question.id}`}
                             />
                         </div>
+                        <button
+                            onClick={handleReport}
+                            disabled={reportMutation.isPending || isReported}
+                            className="flex items-center space-x-1 transition-colors hover:cursor-pointer hover:text-red-600 disabled:opacity-50"
+                            title={isReported ? 'You have reported this question' : 'Report abuse'}
+                        >
+                            {isReported ? <FaFlag className="h-4 w-4 text-red-600" /> : <FaRegFlag className="h-4 w-4" />}
+                            <span>{isReported ? 'Reported' : 'Report'}</span>
+                        </button>
                     </div>
                 </div>
             </div>

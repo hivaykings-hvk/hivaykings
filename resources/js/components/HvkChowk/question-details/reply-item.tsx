@@ -5,12 +5,13 @@ import UserAvatar from '@/Components/UserAvatar';
 import { timeAgo } from '@/lib/time-functions';
 import { titleColorMap } from '@/lib/title-color-map';
 import { User } from '@/types';
+import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import clsx from 'clsx';
 import parse from 'html-react-parser';
 import { useEffect, useState } from 'react';
-import { FaHeart, FaReply } from 'react-icons/fa';
-import { FaCircleCheck, FaRegComment } from 'react-icons/fa6';
+import { FaFlag, FaHeart, FaReply } from 'react-icons/fa';
+import { FaCircleCheck, FaRegComment, FaRegFlag } from 'react-icons/fa6';
 import { toast } from 'sonner';
 import ReplyForm from './reply-form';
 import { useReplyFormContext } from './reply-form-context';
@@ -23,6 +24,7 @@ interface Reply {
     createdAt: string;
     updatedAt: string;
     pinned?: boolean;
+    abuseReported?: boolean;
     user: {
         id: string;
         firstName: string;
@@ -55,7 +57,49 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
     const [redirectUrl, setRedirectUrl] = useState('');
     const [isPinned, setIsPinned] = useState(reply.pinned || false);
     const [isPinLoading, setIsPinLoading] = useState(false);
+    const [isReported, setIsReported] = useState(reply.abuseReported || false);
     const { openReplyFormId, setOpenReplyFormId } = useReplyFormContext();
+
+    const getCsrfToken = () => {
+        const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+        return token || '';
+    };
+
+    const reportMutation = useMutation({
+        mutationFn: async () => {
+            const response = await axios.post(
+                `/api/replies/${reply.id}/report`,
+                {},
+                {
+                    headers: {
+                        'X-CSRF-Token': getCsrfToken(),
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
+                },
+            );
+            return response.data;
+        },
+        onMutate: async () => {
+            const previousReported = isReported;
+            setIsReported(true);
+            return { previousReported };
+        },
+        onSuccess: () => {
+            setIsReported(true);
+            toast.success('Reply reported successfully. Our team will review it.');
+        },
+        onError: (error: any, variables, context) => {
+            if (context) {
+                setIsReported(context.previousReported);
+            }
+            console.error('Error reporting reply:', error);
+            if (error.response?.status === 401) {
+                toast.error('Please login to report abuse');
+            } else {
+                toast.error('Failed to report reply. Please try again.');
+            }
+        },
+    });
 
     useEffect(() => {
         // Close this form if another reply form is opened or if root form is activated
@@ -152,6 +196,18 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
         }
     };
 
+    const handleReport = () => {
+        if (!user) {
+            toast.error('Please login to report abuse');
+            return;
+        }
+        if (isReported) {
+            toast.info('You have already reported this reply');
+            return;
+        }
+        reportMutation.mutate();
+    };
+
     const renderReplyContent = () => {
         if (level === 0) {
             return (
@@ -242,6 +298,16 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
                                         )}
                                     </button>
                                 )}
+
+                                <button
+                                    onClick={handleReport}
+                                    disabled={reportMutation.isPending || isReported}
+                                    className="flex items-center gap-1 transition-colors hover:cursor-pointer hover:text-red-600 disabled:opacity-50"
+                                    title={isReported ? 'You have reported this reply' : 'Report abuse'}
+                                >
+                                    {isReported ? <FaFlag className="h-4 w-4 text-red-600" /> : <FaRegFlag className="h-4 w-4" />}
+                                    <span className="text-sm">{isReported ? 'Reported' : 'Report'}</span>
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -336,6 +402,16 @@ export function ReplyItem({ reply, questionId, level = 0, initialChildCount, use
                                         )}
                                     </button>
                                 )}
+
+                                <button
+                                    onClick={handleReport}
+                                    disabled={reportMutation.isPending || isReported}
+                                    className="flex items-center gap-1 transition-colors hover:cursor-pointer hover:text-red-600 disabled:opacity-50"
+                                    title={isReported ? 'You have reported this reply' : 'Report abuse'}
+                                >
+                                    {isReported ? <FaFlag className="h-4 w-4 text-red-600" /> : <FaRegFlag className="h-4 w-4" />}
+                                    <span className="text-sm">{isReported ? 'Reported' : 'Report'}</span>
+                                </button>
                             </div>
                         </div>
                     </div>

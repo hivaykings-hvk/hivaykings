@@ -22,6 +22,7 @@ class Question extends Model
         'views',
         'likes_count',
         'comments_count',
+        'abuse_reported',
     ];
 
     protected $casts = [

@@ -21,6 +21,7 @@ class QuestionComment extends Model
         'content',
         'likes_count',
         'pinned',
+        'abuse_reported',
     ];
 
     protected $casts = [

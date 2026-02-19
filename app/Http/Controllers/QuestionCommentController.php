@@ -49,6 +49,7 @@ class QuestionCommentController extends Controller
                         'createdAt' => $reply->created_at,
                         'updatedAt' => $reply->updated_at,
                         'pinned' => (bool) $reply->pinned,
+                        'abuseReported' => (bool) $reply->abuse_reported,
                         'user' => [
                             'id' => $reply->user->id,
                             'firstName' => $reply->user->first_name,
@@ -96,6 +97,7 @@ class QuestionCommentController extends Controller
                         'createdAt' => $reply->created_at,
                         'updatedAt' => $reply->updated_at,
                         'pinned' => (bool) $reply->pinned,
+                        'abuseReported' => (bool) $reply->abuse_reported,
                         'user' => [
                             'id' => $reply->user->id,
                             'firstName' => $reply->user->first_name,
@@ -276,6 +278,26 @@ class QuestionCommentController extends Controller
                 'commentId' => $comment->id,
                 'parentId' => $comment->parent_id,
             ],
+        ]);
+    }
+
+    /**
+     * Report a comment/reply for abuse
+     */
+    public function report($commentId)
+    {
+        if (!auth()->check()) {
+            return response()->json(['message' => 'Please login to report abuse'], 401);
+        }
+
+        $comment = QuestionComment::findOrFail($commentId);
+
+        $comment->update(['abuse_reported' => true]);
+
+        return response()->json([
+            'commentId' => $commentId,
+            'abuseReported' => true,
+            'message' => 'Comment reported successfully',
         ]);
     }
 }

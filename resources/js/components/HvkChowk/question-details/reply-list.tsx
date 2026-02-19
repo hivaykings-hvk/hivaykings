@@ -12,6 +12,8 @@ interface Reply {
     content: string;
     createdAt: string;
     updatedAt: string;
+    pinned?: boolean;
+    abuseReported?: boolean;
     user: {
         id: string;
         firstName: string;

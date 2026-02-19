@@ -7,6 +7,7 @@ export interface Question {
     hashtags?: string;
     category?: string;
     userId: string;
+    abuseReported?: boolean;
     createdAt: string;
     updatedAt: string;
     user?: {
