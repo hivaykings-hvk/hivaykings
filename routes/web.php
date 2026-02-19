@@ -82,6 +82,7 @@ Route::get('/api/user', function (Request $request) {
             'state' => $user->state,
             'country' => $user->country,
             'pincode' => $user->pincode,
+            'role' => $user->role,
             'emailVerified' => $user->email_verified_at,
             'phoneVerified' => $user->phone_verified,
             'subscribeNewsletter' => $user->subscribe_newsletter,
@@ -118,6 +119,12 @@ Route::get('/road-ratings', function () {
 Route::get('/road-ratings/create', function () {
     return Inertia::render('CreateRoadRating');
 })->name('road-ratings.create');
+
+Route::get('/road-ratings/{id}/edit', function ($id) {
+    return Inertia::render('EditRoadRating', [
+        'id' => $id,
+    ]);
+})->name('road-ratings.edit');
 
 Route::get('/road-ratings/{id}', function ($id) {
     return Inertia::render('RoadRatingDetail', [
@@ -181,6 +188,12 @@ Route::get('/api/road-ratings/{id}', [RoadRatingController::class, 'show']);
 Route::post('/api/road-ratings', [RoadRatingController::class, 'store']);
 Route::post('/api/road-ratings/{roadRatingId}/user-rating', [RoadRatingController::class, 'storeUserRating']);
 Route::post('/api/road-ratings/{roadRatingId}/comments', [RoadRatingController::class, 'storeComment']);
+
+// Protected road rating edit/update routes (require authentication + admin role)
+Route::middleware('auth')->group(function () {
+    Route::get('/api/road-ratings/{id}/edit', [RoadRatingController::class, 'edit']);
+    Route::put('/api/road-ratings/{id}', [RoadRatingController::class, 'update']);
+});
 
 // Road Rating Comments API Routes
 Route::get('/api/road-ratings/{roadRatingId}/comments-nested', [RoadRatingCommentController::class, 'getComments']);

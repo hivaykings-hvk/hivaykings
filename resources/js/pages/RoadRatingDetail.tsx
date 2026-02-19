@@ -14,7 +14,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { Link, usePage } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-import { Expand, Plus, Share2 } from 'lucide-react';
+import { Expand, Pencil, Plus, Share2 } from 'lucide-react';
 import { FaCircleCheck } from 'react-icons/fa6';
 
 interface RoadRating {
@@ -138,6 +138,13 @@ function RoadRatingDetailContent() {
                             <Button variant="outline" className="flex items-center gap-2">
                                 <Share2 className="h-4 w-4" /> Share Highway
                             </Button>
+                            {user && user.role === 'admin' && (
+                                <Link href={`/road-ratings/${roadRating.id}/edit`}>
+                                    <Button variant="outline" className="flex items-center gap-2">
+                                        <Pencil className="h-4 w-4" /> Edit
+                                    </Button>
+                                </Link>
+                            )}
                         </div>
 
                         <p className="text-sm text-gray-500">

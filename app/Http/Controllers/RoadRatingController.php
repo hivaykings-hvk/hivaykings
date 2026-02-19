@@ -291,4 +291,114 @@ class RoadRatingController extends Controller
             ]
         ], 201);
     }
+
+    public function edit($id)
+    {
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // Check if user is admin
+        if (!Auth::user()->hasRole('admin')) {
+            return response()->json(['message' => 'You do not have permission to edit road ratings'], 403);
+        }
+
+        $rating = RoadRating::findOrFail($id);
+
+        return response()->json([
+            'data' => [
+                'id' => $rating->id,
+                'fromCity' => $rating->from_city,
+                'toCity' => $rating->to_city,
+                'highwayNumber' => $rating->highway_number,
+                'description' => $rating->description,
+                'distanceKm' => $rating->distance_km,
+                'travelTimeHours' => $rating->travel_time_hours,
+                'image' => $rating->image,
+                'region' => $rating->region,
+                'createdAt' => $rating->created_at,
+                'updatedAt' => $rating->updated_at,
+            ]
+        ]);
+    }
+
+    public function update(Request $request, $id)
+    {
+        if (!Auth::check()) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+
+        // Check if user is admin
+        if (!Auth::user()->hasRole('admin')) {
+            return response()->json(['message' => 'You do not have permission to edit road ratings'], 403);
+        }
+
+        $rating = RoadRating::findOrFail($id);
+
+        $validated = $request->validate([
+            'from_city' => 'required|string|min:2|max:100',
+            'to_city' => 'required|string|min:2|max:100',
+            'highway_number' => 'required|string|min:2|max:50',
+            'description' => 'required|string|min:10|max:5000',
+            'distance_km' => 'required|numeric|min:0',
+            'travel_time_hours' => 'required|numeric|min:0',
+            'image' => 'nullable|image|mimes:jpeg,jpg,png,webp|max:5120',
+            'region' => 'required|in:north,south,east,west,central',
+            'delete_user_ratings' => 'nullable|boolean',
+            'delete_comments' => 'nullable|boolean',
+        ]);
+
+        try {
+            // Update image if provided
+            if ($request->hasFile('image')) {
+                $imagePath = $request->file('image')->store(
+                    "road-ratings-images/{$rating->user_id}",
+                    'public'
+                );
+                $rating->image = $imagePath;
+            }
+
+            // Update road rating fields
+            $rating->from_city = $validated['from_city'];
+            $rating->to_city = $validated['to_city'];
+            $rating->highway_number = $validated['highway_number'];
+            $rating->description = $validated['description'];
+            $rating->distance_km = $validated['distance_km'];
+            $rating->travel_time_hours = $validated['travel_time_hours'];
+            $rating->region = $validated['region'];
+            $rating->save();
+
+            // Delete user ratings if checkbox is checked
+            if ($request->boolean('delete_user_ratings')) {
+                UserRoadRating::where('road_rating_id', $id)->delete();
+            }
+
+            // Delete comments if checkbox is checked
+            if ($request->boolean('delete_comments')) {
+                RoadRatingComment::where('road_rating_id', $id)->delete();
+            }
+
+            return response()->json([
+                'data' => [
+                    'id' => $rating->id,
+                    'fromCity' => $rating->from_city,
+                    'toCity' => $rating->to_city,
+                    'highwayNumber' => $rating->highway_number,
+                    'description' => $rating->description,
+                    'distanceKm' => $rating->distance_km,
+                    'travelTimeHours' => $rating->travel_time_hours,
+                    'image' => $rating->image,
+                    'region' => $rating->region,
+                    'createdAt' => $rating->created_at,
+                    'updatedAt' => $rating->updated_at,
+                ],
+                'message' => 'Road rating updated successfully',
+            ], 200);
+        } catch (\Exception $e) {
+            return response()->json([
+                'message' => 'Failed to update road rating.',
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }

@@ -13,6 +13,7 @@ interface User {
     state: string;
     country: string;
     pincode: string;
+    role?: string;
     emailVerified?: string;
     phoneVerified: boolean;
     subscribeNewsletter: boolean;
