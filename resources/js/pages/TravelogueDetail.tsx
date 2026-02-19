@@ -4,12 +4,13 @@ import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
 import LoadingSpinner from '@/Components/spinner';
 import { Button } from '@/Components/ui/button';
 import UserAvatar from '@/Components/UserAvatar';
+import { useAuth } from '@/hooks/useAuth';
 import RootLayout from '@/Layouts/RootLayout';
-import { usePage } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import parse, { DOMNode } from 'html-react-parser';
-import { BookmarkIcon, ChevronLeft, Heart, MessageCircle, Share2 } from 'lucide-react';
+import { BookmarkIcon, ChevronLeft, Heart, MessageCircle, Pencil, Share2 } from 'lucide-react';
 import { FaCalendarDay, FaImages, FaLocationDot, FaRoute, FaVideo } from 'react-icons/fa6';
 
 interface PageProps {
@@ -21,6 +22,7 @@ interface TravelogueDetail {
     title: string;
     content: string;
     images?: string[];
+    userId: string;
     user: {
         id: string;
         firstName: string;
@@ -36,6 +38,7 @@ interface TravelogueDetail {
 function TravelogueDetailContent() {
     const page = usePage<PageProps>();
     const id = page.props.id;
+    const { user } = useAuth();
 
     const {
         data: travelogue,
@@ -165,6 +168,13 @@ function TravelogueDetailContent() {
                             <Button variant="outline" size="sm" className="flex items-center gap-2">
                                 <Share2 className="h-4 w-4" /> Share
                             </Button>
+                            {user && user.id === travelogue?.userId && (
+                                <Link href={`/travelogue/${id}/edit`}>
+                                    <Button variant="outline" size="sm" className="flex items-center gap-2">
+                                        <Pencil className="h-4 w-4" /> Edit
+                                    </Button>
+                                </Link>
+                            )}
                         </div>
                     </div>
 

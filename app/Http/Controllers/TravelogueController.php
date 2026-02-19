@@ -29,6 +29,7 @@ class TravelogueController extends Controller
                     'title' => $travelogue->title,
                     'content' => $travelogue->content,
                     'images' => $travelogue->cover_image ? [$travelogue->cover_image] : [],
+                    'userId' => $travelogue->user_id,
                     'user' => [
                         'id' => $travelogue->user->id,
                         'firstName' => $travelogue->user->first_name,
@@ -69,6 +70,7 @@ class TravelogueController extends Controller
             'title' => $travelogue->title,
             'content' => $travelogue->content,
             'images' => $travelogue->cover_image ? [$travelogue->cover_image] : [],
+            'userId' => $travelogue->user_id,
             'user' => [
                 'id' => $travelogue->user->id,
                 'firstName' => $travelogue->user->first_name,
@@ -123,6 +125,39 @@ class TravelogueController extends Controller
             'message' => 'Travelogue ' . $validated['status'],
             'data' => $travelogue,
         ], 201);
+    }
+
+    /**
+     * Get travelogue for editing
+     */
+    public function edit(Travelogue $travelogue)
+    {
+        // Check authentication
+        if (!auth()->check()) {
+            return response()->json([
+                'message' => 'Unauthenticated. Please log in first.',
+            ], 401);
+        }
+
+        // Check authorization - only the creator can edit
+        if ($travelogue->user_id !== auth()->id()) {
+            return response()->json([
+                'message' => 'You do not have permission to edit this travelogue',
+            ], 403);
+        }
+
+        return response()->json([
+            'data' => [
+                'id' => $travelogue->id,
+                'title' => $travelogue->title,
+                'content' => $travelogue->content,
+                'coverImage' => $travelogue->cover_image,
+                'status' => $travelogue->status,
+                'userId' => $travelogue->user_id,
+                'createdAt' => $travelogue->created_at->toIso8601String(),
+                'updatedAt' => $travelogue->updated_at->toIso8601String(),
+            ]
+        ]);
     }
 
     /**

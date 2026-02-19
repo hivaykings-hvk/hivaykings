@@ -141,6 +141,12 @@ Route::get('/travelogue/create', function () {
     return Inertia::render('CreateTravelogue');
 })->name('travelogue.create');
 
+Route::get('/travelogue/{id}/edit', function ($id) {
+    return Inertia::render('EditTravelogue', [
+        'id' => $id,
+    ]);
+})->name('travelogue.edit');
+
 Route::get('/travelogue/{id}', function ($id) {
     return Inertia::render('TravelogueDetail', [
         'id' => $id,
@@ -214,6 +220,7 @@ Route::get('/api/travelogues/{id}', [TravelogueController::class, 'show']);
 // Protected travelogue routes (require authentication)
 Route::middleware('auth')->group(function () {
     Route::post('/api/travelogues', [TravelogueController::class, 'store']);
+    Route::get('/api/travelogues/{travelogue}/edit', [TravelogueController::class, 'edit']);
     Route::put('/api/travelogues/{travelogue}', [TravelogueController::class, 'update']);
     Route::delete('/api/travelogues/{travelogue}', [TravelogueController::class, 'destroy']);
     Route::get('/api/user/travelogues', [TravelogueController::class, 'userTravelogues']);
