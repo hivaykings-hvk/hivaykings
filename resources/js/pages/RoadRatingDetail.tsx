@@ -3,11 +3,14 @@
 import AdditionalInfoSection from '@/Components/HvkChowk/additional-info-section';
 import CompareRatingsSection from '@/Components/HvkChowk/compare-ratings-section';
 import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
-import ReviewCard from '@/Components/HvkChowk/review-card';
+import ReviewForm from '@/Components/HvkChowk/road-rating-details/review-form';
+import { ReviewFormProvider } from '@/Components/HvkChowk/road-rating-details/review-form-context';
+import ReviewList from '@/Components/HvkChowk/road-rating-details/review-list';
 import RoadRatingInputForm from '@/Components/HvkChowk/road-rating-input-form';
 import LoadingSpinner from '@/Components/spinner';
 import { Button } from '@/Components/ui/button';
 import RootLayout from '@/Layouts/RootLayout';
+import { useAuth } from '@/hooks/useAuth';
 import { Link, usePage } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
@@ -65,6 +68,7 @@ interface PageProps {
 function RoadRatingDetailContent() {
     const page = usePage<PageProps>();
     const roadId = page.props.id;
+    const { user } = useAuth();
 
     const {
         data: roadRating,
@@ -192,13 +196,15 @@ function RoadRatingDetailContent() {
                         </select>
                     </div>
 
-                    {roadRating.comments && roadRating.comments.length > 0 ? (
-                        roadRating.comments.map((comment) => (
-                            <ReviewCard key={comment.id} comment={comment.content} user={comment.user} createdAt={comment.createdAt} />
-                        ))
-                    ) : (
-                        <p className="py-8 text-center text-gray-500">No reviews yet. Be the first to share your experience!</p>
-                    )}
+                    <ReviewFormProvider>
+                        {user && (
+                            <div className="mb-6">
+                                <ReviewForm roadRatingId={roadRating.id} user={user} />
+                            </div>
+                        )}
+
+                        <ReviewList roadRatingId={roadRating.id} user={user || null} />
+                    </ReviewFormProvider>
                 </div>
             </div>
 

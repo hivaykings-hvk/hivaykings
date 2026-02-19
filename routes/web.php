@@ -12,6 +12,7 @@ use App\Http\Controllers\QuestionsController;
 use App\Http\Controllers\QuestionCommentController;
 use App\Http\Controllers\PollsController;
 use App\Http\Controllers\RoadRatingController;
+use App\Http\Controllers\RoadRatingCommentController;
 use App\Http\Controllers\QuestionDetailController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\TravelogueController;
@@ -180,6 +181,18 @@ Route::get('/api/road-ratings/{id}', [RoadRatingController::class, 'show']);
 Route::post('/api/road-ratings', [RoadRatingController::class, 'store']);
 Route::post('/api/road-ratings/{roadRatingId}/user-rating', [RoadRatingController::class, 'storeUserRating']);
 Route::post('/api/road-ratings/{roadRatingId}/comments', [RoadRatingController::class, 'storeComment']);
+
+// Road Rating Comments API Routes
+Route::get('/api/road-ratings/{roadRatingId}/comments-nested', [RoadRatingCommentController::class, 'getComments']);
+Route::get('/api/road-rating-comments/{parentId}/children', [RoadRatingCommentController::class, 'getChildComments']);
+Route::get('/api/road-rating-comments/{parentId}/child-count', [RoadRatingCommentController::class, 'getChildCount']);
+
+// Protected road rating comment routes (require authentication)
+Route::middleware('auth')->group(function () {
+    Route::post('/api/road-rating-comments', [RoadRatingCommentController::class, 'store']);
+    Route::post('/api/road-rating-comments/{parentId}/child', [RoadRatingCommentController::class, 'storeChild']);
+    Route::post('/api/road-rating-comments/{commentId}/report', [RoadRatingCommentController::class, 'report']);
+});
 
 // Travelogue API Routes
 Route::get('/api/travelogues', [TravelogueController::class, 'index']);
