@@ -92,7 +92,14 @@ function CreateTravelogueContent() {
             setCoverImageFile(null);
             setCoverImagePreview(null);
             editorRef.current?.clearContent?.();
-            window.location.href = '/travelogue';
+
+            // Redirect based on status - drafts go to edit page, published go to travelogue list
+            const travelogueId = response.data.data?.id;
+            if (!isPublished && travelogueId) {
+                window.location.href = `/travelogue/${travelogueId}/edit`;
+            } else {
+                window.location.href = '/travelogue';
+            }
         } catch (error: any) {
             const errorMessage = error.response?.data?.message || 'Failed to create travelogue';
             toast.error(errorMessage);

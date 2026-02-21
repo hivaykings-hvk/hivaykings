@@ -133,10 +133,14 @@ function EditTravelogueContent() {
 
             return response.data;
         },
-        onSuccess: (data) => {
+        onSuccess: (data, variables) => {
             toast.success(data.message || 'Travelogue updated successfully');
             queryClient.invalidateQueries({ queryKey: ['travelogue', id] });
-            router.visit(`/travelogue/${id}`);
+
+            // Only redirect if published, stay on page if draft
+            if (variables.status === 'published') {
+                router.visit(`/travelogue/${id}`);
+            }
         },
         onError: (error: any) => {
             const errorMessage = error.response?.data?.message || 'Failed to update travelogue';
@@ -156,11 +160,14 @@ function EditTravelogueContent() {
 
     const onSubmit = async (values: EditTravelogueFormValues, status: 'draft' | 'published') => {
         setIsSubmitting(true);
-        updateTravelogueMutation.mutate({
-            ...values,
-            status,
-        });
-        setIsSubmitting(false);
+        try {
+            await updateTravelogueMutation.mutateAsync({
+                ...values,
+                status,
+            });
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     if (isLoadingTravelogue) return <LoadingSpinner />;
@@ -170,7 +177,7 @@ function EditTravelogueContent() {
             <div className="container mx-auto flex flex-grow flex-col py-8">
                 <h1 className="mb-6 text-3xl font-bold text-gray-800">Edit Travelogue</h1>
                 <Form {...form}>
-                    <form onSubmit={form.handleSubmit((values) => onSubmit(values, 'draft'))} className="flex h-full flex-col space-y-6">
+                    <form className="flex h-full flex-col space-y-6">
                         {/* Cover Image Upload */}
                         <FormItem>
                             <FormLabel>Cover Image</FormLabel>
@@ -258,8 +265,14 @@ function EditTravelogueContent() {
                             <Button type="button" variant="outline" onClick={() => router.visit(`/travelogue/${id}`)}>
                                 Cancel
                             </Button>
-                            <Button type="submit" variant="outline" disabled={isSubmitting || updateTravelogueMutation.isPending}>
-                                Save Draft
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={form.handleSubmit((values) => onSubmit(values, 'draft'))}
+                                disabled={isSubmitting || updateTravelogueMutation.isPending}
+                                className="inline-flex items-center"
+                            >
+                                {updateTravelogueMutation.isPending && <CgSpinner className="mr-2 animate-spin" />} Save Draft
                             </Button>
                             <Button
                                 type="button"
