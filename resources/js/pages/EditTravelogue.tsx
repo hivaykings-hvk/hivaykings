@@ -262,7 +262,7 @@ function EditTravelogueContent() {
                         />
 
                         <div className="mt-6 flex justify-end gap-4">
-                            <Button type="button" variant="outline" onClick={() => router.visit(`/travelogue/${id}`)}>
+                            <Button type="button" variant="outline" onClick={() => window.history.back()}>
                                 Cancel
                             </Button>
                             <Button

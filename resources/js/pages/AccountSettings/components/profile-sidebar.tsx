@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { FiLock, FiMapPin, FiMenu, FiSettings, FiUser, FiX } from 'react-icons/fi';
+import { FiBook, FiLock, FiMapPin, FiMenu, FiSettings, FiUser, FiX } from 'react-icons/fi';
 import { AddressForm } from './address-form';
+import { MyTraveloguesForm } from './my-travelogues';
 import { PasswordChangeForm } from './password-change-form';
 import { PersonalInfoForm } from './personal-info-form';
 import { PreferencesForm } from './preferences-form';
@@ -9,7 +10,7 @@ interface ProfileSidebarProps {
     user: any;
 }
 
-type Section = 'personal' | 'address' | 'preferences' | 'security';
+type Section = 'personal' | 'address' | 'preferences' | 'security' | 'travelogues';
 
 export function ProfileSidebar({ user }: ProfileSidebarProps) {
     const [activeSection, setActiveSection] = useState<Section>('personal');
@@ -43,6 +44,11 @@ export function ProfileSidebar({ user }: ProfileSidebarProps) {
             label: 'Security',
             icon: FiLock,
         },
+        {
+            id: 'travelogues' as Section,
+            label: 'My Travelogues',
+            icon: FiBook,
+        },
     ];
 
     const renderContent = () => {
@@ -55,6 +61,8 @@ export function ProfileSidebar({ user }: ProfileSidebarProps) {
                 return <PreferencesForm key={user.id} user={user} />;
             case 'security':
                 return <PasswordChangeForm key={user.id} />;
+            case 'travelogues':
+                return <MyTraveloguesForm key={user.id} />;
             default:
                 return null;
         }

@@ -200,16 +200,27 @@ class TravelogueController extends Controller
     }
 
     /**
-     * Get user's travelogues (drafts and published)
+     * Get user's travelogues (drafts and published) with pagination
      */
-    public function userTravelogues()
+    public function userTravelogues(Request $request)
     {
+        $perPage = $request->query('per_page', 10);
+        $perPage = in_array($perPage, [10, 20, 30, 50]) ? $perPage : 10;
+
         $travelogues = Travelogue::where('user_id', auth()->id())
             ->orderByDesc('created_at')
-            ->get();
+            ->paginate($perPage);
 
         return response()->json([
-            'data' => $travelogues,
+            'data' => $travelogues->items(),
+            'pagination' => [
+                'total' => $travelogues->total(),
+                'per_page' => $travelogues->perPage(),
+                'current_page' => $travelogues->currentPage(),
+                'last_page' => $travelogues->lastPage(),
+                'from' => $travelogues->firstItem(),
+                'to' => $travelogues->lastItem(),
+            ],
         ]);
     }
 
