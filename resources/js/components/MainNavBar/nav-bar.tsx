@@ -3,6 +3,7 @@
 import { useAuth } from '@/hooks/useAuth';
 import { useEffect, useState } from 'react';
 import { FaPowerOff, FaRegUser, FaRoad, FaRoute } from 'react-icons/fa6';
+import { MdOutlineDashboard } from 'react-icons/md';
 import UserAvatar from '../UserAvatar';
 import ActiveLink from './active-link';
 import FixedNavBarWrapper from './fixed-nav-bar-wrapper';
@@ -34,6 +35,7 @@ interface User {
     state: string;
     country: string;
     pincode: string;
+    role?: string;
     emailVerified?: string;
     phoneVerified: boolean;
     subscribeNewsletter: boolean;
@@ -164,6 +166,15 @@ const NavBar = () => {
                                         <a href="/road-ratings/create" className="flex items-center gap-3">
                                             <FaRoad className="h-5 w-5 text-gray-50 group-focus:text-neutral-800" />
                                             <div className="text-sm text-gray-50 group-focus:text-neutral-800">Create Road Rating</div>
+                                        </a>
+                                    </DropdownMenuItem>
+                                )}
+
+                                {(user.role === 'admin' || user.role === 'chief') && (
+                                    <DropdownMenuItem className="group hover:cursor-pointer focus:bg-primary">
+                                        <a href="/admin/dashboard" className="flex items-center gap-3">
+                                            <MdOutlineDashboard className="h-5 w-5 text-gray-50 group-focus:text-neutral-800" />
+                                            <div className="text-sm text-gray-50 group-focus:text-neutral-800">Admin Dashboard</div>
                                         </a>
                                     </DropdownMenuItem>
                                 )}

@@ -19,6 +19,7 @@ class Travelogue extends Model
         'cover_image',
         'status',
         'published_at',
+        'abuse_reported',
     ];
 
     protected $casts = [

@@ -7,11 +7,12 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TravelogueComment extends Model
 {
     /** @use HasFactory<\Database\Factories\TravelogueCommentFactory> */
-    use HasFactory, HasUuids;
+    use HasFactory, HasUuids, SoftDeletes;
 
     protected $fillable = [
         'travelogue_id',
@@ -21,9 +22,7 @@ class TravelogueComment extends Model
         'abuse_reported',
     ];
 
-    protected $casts = [
-        'abuse_reported' => 'boolean',
-    ];
+
 
     public function travelogue(): BelongsTo
     {

@@ -18,6 +18,7 @@ use App\Http\Controllers\ImageController;
 use App\Http\Controllers\TravelogueController;
 use App\Http\Controllers\TravelogueCommentController;
 use App\Http\Controllers\SearchController;
+use App\Http\Controllers\AdminController;
 
 Route::get('/', function () {
     return Inertia::render('home');
@@ -249,6 +250,27 @@ Route::middleware('auth')->group(function () {
     // Image Upload Routes for Rich Text Editor
     Route::post('/api/upload-image', [ImageController::class, 'uploadImage']);
     Route::get('/api/user-images', [ImageController::class, 'getUserImages']);
+});
+
+// Admin Dashboard Routes (Protected)
+Route::middleware('auth')->group(function () {
+    Route::get('/admin/dashboard', function () {
+        return Inertia::render('AdminDashboard');
+    })->name('admin.dashboard');
+    
+    Route::get('/api/admin/dashboard-stats', [AdminController::class, 'getDashboardStats']);
+    Route::get('/api/admin/reported-questions', [AdminController::class, 'getReportedQuestions']);
+    Route::delete('/api/admin/questions/{id}', [AdminController::class, 'deleteQuestion']);
+    Route::patch('/api/admin/questions/{id}/discard', [AdminController::class, 'discardQuestion']);
+    Route::get('/api/admin/reported-question-comments', [AdminController::class, 'getReportedQuestionComments']);
+    Route::delete('/api/admin/question-comments/{id}', [AdminController::class, 'deleteQuestionComment']);
+    Route::patch('/api/admin/question-comments/{id}/discard', [AdminController::class, 'discardQuestionComment']);
+    Route::get('/api/admin/reported-road-rating-comments', [AdminController::class, 'getReportedRoadRatingComments']);
+    Route::delete('/api/admin/road-rating-comments/{id}', [AdminController::class, 'deleteRoadRatingComment']);
+    Route::patch('/api/admin/road-rating-comments/{id}/discard', [AdminController::class, 'discardRoadRatingComment']);
+    Route::get('/api/admin/reported-travelogue-comments', [AdminController::class, 'getReportedTravelogueComments']);
+    Route::delete('/api/admin/travelogue-comments/{id}', [AdminController::class, 'deleteTravelogueComment']);
+    Route::patch('/api/admin/travelogue-comments/{id}/discard', [AdminController::class, 'discardTravelogueComment']);
 });
 
 // Account Settings Page

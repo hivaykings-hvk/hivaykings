@@ -1,6 +1,7 @@
 'use client';
 
 import { FaRegUser, FaRoad, FaRoute } from 'react-icons/fa6';
+import { MdOutlineDashboard } from 'react-icons/md';
 import MobileSignOutButton from './mobile-sign-out-button';
 import AppProfileNavLink from './profile-nav-link';
 
@@ -17,6 +18,7 @@ interface User {
     state: string;
     country: string;
     pincode: string;
+    role?: string;
     emailVerified?: string;
     phoneVerified: boolean;
     subscribeNewsletter: boolean;
@@ -53,6 +55,14 @@ const MobileProfileMenu = ({ user }: { user: User | null }) => {
                     <div className="flex items-center justify-center gap-3 hover:cursor-pointer">
                         <FaRoad className="h-5 w-5 text-gray-50 group-focus:text-neutral-800" />
                         <AppProfileNavLink href="/road-ratings/create" label="Create Road Rating" />
+                    </div>
+                </div>
+            )}
+            {(user.role === 'admin' || user.role === 'chief') && (
+                <div className="w-full py-3">
+                    <div className="flex items-center justify-center gap-3 hover:cursor-pointer">
+                        <MdOutlineDashboard className="h-5 w-5 text-gray-50 group-focus:text-neutral-800" />
+                        <AppProfileNavLink href="/admin/dashboard" label="Admin Dashboard" />
                     </div>
                 </div>
             )}
