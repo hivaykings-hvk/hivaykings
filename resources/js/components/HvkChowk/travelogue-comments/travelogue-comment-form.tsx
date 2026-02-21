@@ -12,11 +12,12 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import z from 'zod';
 
-const ReviewFormSchema = z.object({
+// Define Zod schema
+const TravelogueCommentFormSchema = z.object({
     content: z
         .string()
         .refine((val) => val && val.trim().length > 0, {
-            message: 'Comment is required',
+            message: 'Comment content is required',
         })
         .refine((val) => val && val.trim().length >= 3, {
             message: 'Comment must be at least 3 characters long',
@@ -24,15 +25,15 @@ const ReviewFormSchema = z.object({
         .refine((val) => val && val.length <= 5000, {
             message: 'Comment cannot exceed 5000 characters',
         }),
-    roadRatingId: z.string().min(1, 'Road rating ID is required'),
+    travelogueId: z.string().min(1, 'Travelogue ID is required'),
     parentId: z.string().optional(),
 });
 
-interface ReviewFormProps {
-    roadRatingId: string;
-    user?: User | null;
+interface TravelogueCommentFormProps {
+    travelogueId: string;
+    user: User;
     parentId?: string;
-    onSubmitSuccess?: () => void;
+    onSuccess?: () => void;
 }
 
 interface Comment {
@@ -50,30 +51,32 @@ interface Comment {
     childCount: number;
 }
 
-export default function ReviewForm({ roadRatingId, user, parentId, onSubmitSuccess }: ReviewFormProps) {
+export default function TravelogueCommentForm({ travelogueId, user, parentId, onSuccess }: TravelogueCommentFormProps) {
     const queryClient = useQueryClient();
-    const reviewForm = useForm<z.infer<typeof ReviewFormSchema>>({
-        resolver: zodResolver(ReviewFormSchema),
+    const commentForm = useForm<z.infer<typeof TravelogueCommentFormSchema>>({
+        resolver: zodResolver(TravelogueCommentFormSchema),
         mode: 'onBlur',
         defaultValues: {
             content: '',
-            roadRatingId: String(roadRatingId),
+            travelogueId: String(travelogueId),
             parentId: parentId ? String(parentId) : undefined,
         },
     });
 
+    // Monitor form state changes
     useEffect(() => {
-        const subscription = reviewForm.watch(() => {});
+        const subscription = commentForm.watch(() => {});
         return () => subscription.unsubscribe();
-    }, [reviewForm]);
+    }, [commentForm]);
 
     const getCsrfToken = () => {
         const token = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         return token || '';
     };
 
-    const submitReviewMutation = useMutation({
-        mutationFn: async (values: z.infer<typeof ReviewFormSchema>) => {
+    const submitCommentMutation = useMutation({
+        mutationFn: async (values: z.infer<typeof TravelogueCommentFormSchema>) => {
+            // Validate
             if (!user) {
                 throw new Error('You must be logged in to submit a comment');
             }
@@ -81,7 +84,7 @@ export default function ReviewForm({ roadRatingId, user, parentId, onSubmitSucce
             const textContent = values.content.replace(/<[^>]*>/g, '').trim();
 
             if (textContent.length === 0) {
-                throw new Error('Comment cannot be empty');
+                throw new Error('Comment content cannot be empty');
             }
 
             if (textContent.length < 3) {
@@ -92,11 +95,11 @@ export default function ReviewForm({ roadRatingId, user, parentId, onSubmitSucce
                 throw new Error('Comment cannot exceed 5000 characters');
             }
 
-            const endpoint = parentId ? `/api/road-rating-comments/${parentId}/child` : '/api/road-rating-comments';
+            const endpoint = parentId ? `/api/travelogue-comments/${parentId}/child` : '/api/travelogue-comments';
             const csrfToken = getCsrfToken();
             const payload = {
                 content: values.content,
-                roadRatingId: values.roadRatingId,
+                travelogue_id: values.travelogueId,
                 ...(parentId && { parentId: values.parentId }),
             };
 
@@ -108,18 +111,21 @@ export default function ReviewForm({ roadRatingId, user, parentId, onSubmitSucce
                 },
             });
 
-            return response.data;
+            return response.data.data;
         },
-        onMutate: async (newReview) => {
-            const queryKey = [`/api/road-ratings/${roadRatingId}/comments-nested`];
+        onMutate: async (newComment) => {
+            const queryKey = parentId ? ['travelogue-comments', parentId, 'children'] : ['travelogue-comments', travelogueId];
 
+            // Cancel any outgoing refetches
             await queryClient.cancelQueries({ queryKey });
 
+            // Snapshot the previous data
             const previousData = queryClient.getQueryData(queryKey);
 
+            // Optimistically update to the new value
             const newCommentData: Comment = {
                 id: String(Math.random()),
-                content: newReview.content,
+                content: newComment.content,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
                 user: {
@@ -132,22 +138,28 @@ export default function ReviewForm({ roadRatingId, user, parentId, onSubmitSucce
                 childCount: 0,
             };
 
-            queryClient.setQueryData(queryKey, (oldData: any) => ({
-                ...oldData,
-                data: {
-                    ...oldData?.data,
-                    comments: [newCommentData, ...(oldData?.data?.comments || [])],
-                    total: (oldData?.data?.total || 0) + 1,
-                },
-            }));
+            if (parentId) {
+                // For nested comments
+                queryClient.setQueryData(queryKey, (oldData: any) => {
+                    return oldData ? [newCommentData, ...oldData] : [newCommentData];
+                });
+            } else {
+                // For top-level comments
+                queryClient.setQueryData(queryKey, (oldData: any) => {
+                    return oldData ? [newCommentData, ...oldData] : [newCommentData];
+                });
+            }
 
             return { previousData };
         },
         onError: (error: any, variables, context: any) => {
+            // Rollback on error
             if (context?.previousData) {
-                queryClient.setQueryData([`/api/road-ratings/${roadRatingId}/comments-nested`], context.previousData);
+                const queryKey = parentId ? ['travelogue-comments', parentId, 'children'] : ['travelogue-comments', travelogueId];
+                queryClient.setQueryData(queryKey, context.previousData);
             }
 
+            // Show error toast
             const errorMessage = error.response?.data?.errors
                 ? Object.values(error.response.data.errors)[0]
                 : error.message || 'Failed to post comment. Please try again.';
@@ -158,16 +170,17 @@ export default function ReviewForm({ roadRatingId, user, parentId, onSubmitSucce
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({
-                queryKey: [`/api/road-ratings/${roadRatingId}/comments-nested`],
-            });
-
+            // Invalidate both parent and nested queries
             if (parentId) {
                 queryClient.invalidateQueries({
-                    queryKey: [`/api/road-rating-comments/${parentId}/children`],
+                    queryKey: ['travelogue-comments', parentId, 'children'],
                 });
                 queryClient.invalidateQueries({
-                    queryKey: [`/api/road-rating-comments/${parentId}/child-count`],
+                    queryKey: ['travelogue-comments', parentId, 'child-count'],
+                });
+            } else {
+                queryClient.invalidateQueries({
+                    queryKey: ['travelogue-comments', travelogueId],
                 });
             }
 
@@ -176,32 +189,34 @@ export default function ReviewForm({ roadRatingId, user, parentId, onSubmitSucce
                 duration: 3000,
             });
 
-            reviewForm.reset({
+            // Reset form
+            commentForm.reset({
                 content: '',
-                roadRatingId: String(roadRatingId),
+                travelogueId: String(travelogueId),
                 parentId: parentId ? String(parentId) : undefined,
             });
 
-            onSubmitSuccess?.();
+            // Call the callback if provided
+            onSuccess?.();
         },
     });
 
-    const onSubmit = async (data: z.infer<typeof ReviewFormSchema>) => {
-        await submitReviewMutation.mutateAsync(data);
+    const handleSubmit = async (values: z.infer<typeof TravelogueCommentFormSchema>) => {
+        submitCommentMutation.mutate(values);
     };
 
     return (
-        <div id="share-your-review" className="mt-8 rounded-lg bg-white p-6 shadow-xl">
-            <h2 className="text-md mb-4 font-medium text-gray-800">Share your review</h2>
+        <div id="share-your-comment" className="mt-8 rounded-lg bg-white p-6 shadow-xl">
+            <h2 className="text-md mb-4 font-medium text-gray-800">Share your experience</h2>
             <div className="mb-4 flex w-full flex-col items-start gap-4 sm:flex-row">
                 <UserAvatar imageUrl={user?.image} firstName={user?.firstName} lastName={user?.lastName} />
                 <div className="flex w-full flex-1 flex-col">
-                    <Form {...reviewForm}>
-                        <form onSubmit={reviewForm.handleSubmit(onSubmit)} className="w-full">
-                            <input type="hidden" {...reviewForm.register('roadRatingId')} defaultValue={String(roadRatingId)} />
-                            {parentId && <input type="hidden" {...reviewForm.register('parentId')} defaultValue={String(parentId)} />}
+                    <Form {...commentForm}>
+                        <form onSubmit={commentForm.handleSubmit(handleSubmit)} className="w-full">
+                            <input type="hidden" {...commentForm.register('travelogueId')} defaultValue={String(travelogueId)} />
+                            {parentId && <input type="hidden" {...commentForm.register('parentId')} defaultValue={String(parentId)} />}
                             <FormField
-                                control={reviewForm.control}
+                                control={commentForm.control}
                                 name="content"
                                 render={({ field }) => (
                                     <FormItem>
@@ -231,10 +246,10 @@ export default function ReviewForm({ roadRatingId, user, parentId, onSubmitSucce
                             <div className="flex w-full justify-end">
                                 <button
                                     type="submit"
-                                    disabled={submitReviewMutation.isPending}
+                                    disabled={submitCommentMutation.isPending}
                                     className="text-md mt-6 cursor-pointer rounded-xl bg-primary px-6 py-2 font-semibold text-gray-800 disabled:opacity-50 md:mt-0"
                                 >
-                                    {submitReviewMutation.isPending ? 'Posting...' : parentId ? 'Post Reply' : 'Post Review'}
+                                    {submitCommentMutation.isPending ? 'Posting...' : parentId ? 'Post Reply' : 'Post Comment'}
                                 </button>
                             </div>
                         </form>

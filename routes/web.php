@@ -16,6 +16,7 @@ use App\Http\Controllers\RoadRatingCommentController;
 use App\Http\Controllers\QuestionDetailController;
 use App\Http\Controllers\ImageController;
 use App\Http\Controllers\TravelogueController;
+use App\Http\Controllers\TravelogueCommentController;
 use App\Http\Controllers\SearchController;
 
 Route::get('/', function () {
@@ -224,6 +225,18 @@ Route::middleware('auth')->group(function () {
     Route::put('/api/travelogues/{travelogue}', [TravelogueController::class, 'update']);
     Route::delete('/api/travelogues/{travelogue}', [TravelogueController::class, 'destroy']);
     Route::get('/api/user/travelogues', [TravelogueController::class, 'userTravelogues']);
+});
+
+// Travelogue Comments API Routes
+Route::get('/api/travelogues/{travelogueId}/comments-nested', [TravelogueCommentController::class, 'getComments']);
+Route::get('/api/travelogue-comments/{parentId}/children', [TravelogueCommentController::class, 'getChildComments']);
+Route::get('/api/travelogue-comments/{parentId}/child-count', [TravelogueCommentController::class, 'getChildCount']);
+
+// Protected travelogue comment routes (require authentication)
+Route::middleware('auth')->group(function () {
+    Route::post('/api/travelogue-comments', [TravelogueCommentController::class, 'store']);
+    Route::post('/api/travelogue-comments/{parentId}/child', [TravelogueCommentController::class, 'storeChild']);
+    Route::post('/api/travelogue-comments/{commentId}/report', [TravelogueCommentController::class, 'report']);
 });
 
 // User Profile API Routes (Protected)

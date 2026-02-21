@@ -1,6 +1,9 @@
 'use client';
 
 import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
+import { TravelogueCommentProvider } from '@/Components/HvkChowk/travelogue-comments/travelogue-comment-context';
+import TravelogueCommentForm from '@/Components/HvkChowk/travelogue-comments/travelogue-comment-form';
+import TravelogueCommentList from '@/Components/HvkChowk/travelogue-comments/travelogue-comment-list';
 import LoadingSpinner from '@/Components/spinner';
 import { Button } from '@/Components/ui/button';
 import UserAvatar from '@/Components/UserAvatar';
@@ -182,6 +185,23 @@ function TravelogueDetailContent() {
                     <div className="prose max-w-none">
                         <div>{parse(travelogue.content, options)}</div>
                     </div>
+                </div>
+            </div>
+
+            {/* Comments Section */}
+            <div className="bg-gray-50">
+                <div className="container mx-auto px-4 py-8">
+                    <h2 className="mb-6 text-2xl font-semibold text-gray-800">Comments & Experiences</h2>
+
+                    <TravelogueCommentProvider>
+                        {user && (
+                            <div className="mb-6">
+                                <TravelogueCommentForm travelogueId={travelogue.id} user={user} />
+                            </div>
+                        )}
+
+                        <TravelogueCommentList travelogueId={travelogue.id} user={user || null} />
+                    </TravelogueCommentProvider>
                 </div>
             </div>
 
