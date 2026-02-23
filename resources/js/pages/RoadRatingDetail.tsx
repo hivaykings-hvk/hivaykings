@@ -40,6 +40,22 @@ interface RoadRating {
         safetyIndex: number;
         scenicValue: number;
     };
+    chiefRatings: Array<{
+        id: string;
+        roadCondition: number;
+        traffic: number;
+        facilities: number;
+        safetyIndex: number;
+        scenicValue: number;
+        user: {
+            id: string;
+            firstName: string;
+            lastName: string;
+            title: string;
+            image: string;
+        };
+        createdAt: string;
+    }>;
     communityRating: {
         roadCondition: number;
         traffic: number;
@@ -179,6 +195,15 @@ function RoadRatingDetailContent() {
                     safetyIndex: roadRating.chiefRating.safetyIndex,
                     scenicValue: roadRating.chiefRating.scenicValue,
                 }}
+                chiefRatings={roadRating.chiefRatings?.map((rating) => ({
+                    id: rating.id,
+                    roadCondition: rating.roadCondition,
+                    traffic: rating.traffic,
+                    facilities: rating.facilities,
+                    safetyIndex: rating.safetyIndex,
+                    scenicValue: rating.scenicValue,
+                    user: rating.user,
+                }))}
                 communityRating={{
                     totalReviews: roadRating.totalUserRatings,
                     roadCondition: roadRating.communityRating.roadCondition,

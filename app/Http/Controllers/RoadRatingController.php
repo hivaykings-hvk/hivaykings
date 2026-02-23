@@ -46,6 +46,18 @@ class RoadRatingController extends Controller
                 )
                 : 0;
 
+            // Calculate chief rating average if exists
+            $chiefAvg = 0;
+            if ($chiefRating) {
+                $chiefAvg = (
+                    $chiefRating->road_condition +
+                    $chiefRating->traffic +
+                    $chiefRating->facilities +
+                    $chiefRating->safety_index +
+                    $chiefRating->scenic_value
+                ) / 5;
+            }
+
             return [
                 'id' => $rating->id,
                 'fromCity' => $rating->from_city,
@@ -63,6 +75,14 @@ class RoadRatingController extends Controller
                     'title' => $rating->user->title,
                     'image' => $rating->user->image_path,
                 ] : null,
+                'chiefRating' => $chiefRating ? [
+                    'roadCondition' => $chiefRating->road_condition,
+                    'traffic' => $chiefRating->traffic,
+                    'facilities' => $chiefRating->facilities,
+                    'safetyIndex' => $chiefRating->safety_index,
+                    'scenicValue' => $chiefRating->scenic_value,
+                ] : null,
+                'chiefAverageRating' => $chiefAvg,
                 'averageRating' => $communityAvg,
                 'totalReviews' => $totalReviews,
                 'createdAt' => $rating->created_at,
@@ -80,10 +100,11 @@ class RoadRatingController extends Controller
 
     public function show($id)
     {
-        $rating = RoadRating::with(['user', 'chiefRating', 'userRatings', 'comments.user'])->findOrFail($id);
+        $rating = RoadRating::with(['user', 'chiefRating', 'userRatings', 'chiefRatings.user', 'comments.user'])->findOrFail($id);
 
         $chiefRating = $rating->chiefRating()->first();
         $userRatings = $rating->userRatings;
+        $chiefRatings = $rating->chiefRatings;
         $totalReviews = $userRatings->count();
 
         $communityRoadConditionRating = $totalReviews > 0 ? $userRatings->avg('road_condition') : 0;
@@ -95,6 +116,18 @@ class RoadRatingController extends Controller
         $averageRating = $totalReviews > 0
             ? (($communityRoadConditionRating + $communityTrafficRating + $communityFacilitiesRating + $communitySafetyIndexRating + $communityScenicValueRating) / 5)
             : 0;
+
+        // Calculate chief rating average
+        $chiefAvg = 0;
+        if ($chiefRating) {
+            $chiefAvg = (
+                $chiefRating->road_condition +
+                $chiefRating->traffic +
+                $chiefRating->facilities +
+                $chiefRating->safety_index +
+                $chiefRating->scenic_value
+            ) / 5;
+        }
 
         return response()->json([
             'data' => [
@@ -121,6 +154,25 @@ class RoadRatingController extends Controller
                     'safetyIndex' => $chiefRating?->safety_index ?? 0,
                     'scenicValue' => $chiefRating?->scenic_value ?? 0,
                 ],
+                'chiefAverageRating' => $chiefAvg,
+                'chiefRatings' => $chiefRatings->map(function ($rating) {
+                    return [
+                        'id' => $rating->id,
+                        'roadCondition' => $rating->road_condition,
+                        'traffic' => $rating->traffic,
+                        'facilities' => $rating->facilities,
+                        'safetyIndex' => $rating->safety_index,
+                        'scenicValue' => $rating->scenic_value,
+                        'user' => $rating->user ? [
+                            'id' => $rating->user->id,
+                            'firstName' => $rating->user->first_name,
+                            'lastName' => $rating->user->last_name,
+                            'title' => $rating->user->title,
+                            'image' => $rating->user->image_path,
+                        ] : null,
+                        'createdAt' => $rating->created_at,
+                    ];
+                })->toArray(),
                 'communityRating' => [
                     'roadCondition' => $communityRoadConditionRating,
                     'traffic' => $communityTrafficRating,
@@ -235,26 +287,49 @@ class RoadRatingController extends Controller
             'scenic_value' => 'required|numeric|min:0|max:5',
         ]);
 
-        $existingRating = UserRoadRating::where('road_rating_id', $roadRatingId)
-            ->where('user_id', Auth::id())
-            ->first();
+        $user = Auth::user();
+        $isChief = $user->role === 'chief';
 
-        if ($existingRating) {
-            return response()->json(['message' => 'You have already rated this road'], 400);
+        if ($isChief) {
+            $existingRating = ChiefRoadRating::where('road_rating_id', $roadRatingId)
+                ->where('user_id', Auth::id())
+                ->first();
+
+            if ($existingRating) {
+                return response()->json(['message' => 'You have already rated this road'], 400);
+            }
+
+            $rating = ChiefRoadRating::create([
+                'road_rating_id' => $roadRatingId,
+                'user_id' => Auth::id(),
+                'road_condition' => $validated['road_condition'],
+                'traffic' => $validated['traffic'],
+                'facilities' => $validated['facilities'],
+                'safety_index' => $validated['safety_index'],
+                'scenic_value' => $validated['scenic_value'],
+            ]);
+        } else {
+            $existingRating = UserRoadRating::where('road_rating_id', $roadRatingId)
+                ->where('user_id', Auth::id())
+                ->first();
+
+            if ($existingRating) {
+                return response()->json(['message' => 'You have already rated this road'], 400);
+            }
+
+            $rating = UserRoadRating::create([
+                'road_rating_id' => $roadRatingId,
+                'user_id' => Auth::id(),
+                'road_condition' => $validated['road_condition'],
+                'traffic' => $validated['traffic'],
+                'facilities' => $validated['facilities'],
+                'safety_index' => $validated['safety_index'],
+                'scenic_value' => $validated['scenic_value'],
+            ]);
         }
 
-        $userRating = UserRoadRating::create([
-            'road_rating_id' => $roadRatingId,
-            'user_id' => Auth::id(),
-            'road_condition' => $validated['road_condition'],
-            'traffic' => $validated['traffic'],
-            'facilities' => $validated['facilities'],
-            'safety_index' => $validated['safety_index'],
-            'scenic_value' => $validated['scenic_value'],
-        ]);
-
         return response()->json([
-            'data' => $userRating
+            'data' => $rating
         ], 201);
     }
 

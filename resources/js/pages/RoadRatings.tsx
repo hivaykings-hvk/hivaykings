@@ -29,6 +29,14 @@ interface RoadRating {
         title: string;
         image: string;
     };
+    chiefRating?: {
+        roadCondition: number;
+        traffic: number;
+        facilities: number;
+        safetyIndex: number;
+        scenicValue: number;
+    };
+    chiefAverageRating: number;
     averageRating: number;
     totalReviews: number;
     createdAt: string;
@@ -219,14 +227,21 @@ function RoadRatingsContent() {
                                                 <p className="mt-2 mb-4 text-sm text-gray-600">
                                                     {rating.highwayNumber} - {rating.description?.slice(0, 70)}...
                                                 </p>
-                                                <div className="mt-4 flex flex-col items-start sm:justify-between xl:flex-row xl:items-center">
-                                                    <div className="mb-2 flex items-center">
-                                                        <span className="mr-2 text-sm font-medium">Average:</span>
+                                                <div className="mt-4 space-y-2">
+                                                    {rating.chiefAverageRating > 0 && (
+                                                        <div className="flex items-center">
+                                                            <span className="mr-2 text-sm font-medium">Chief Rating:</span>
+                                                            <div className="flex gap-1">{renderStars(rating.chiefAverageRating)}</div>
+                                                            <span className="ml-1 text-sm">{rating.chiefAverageRating.toFixed(1)}</span>
+                                                        </div>
+                                                    )}
+                                                    <div className="flex items-center">
+                                                        <span className="mr-2 text-sm font-medium">Community Ratings:</span>
                                                         <div className="flex gap-1">{renderStars(rating.averageRating)}</div>
                                                         <span className="ml-1 text-sm">{rating.averageRating.toFixed(1)}</span>
                                                     </div>
                                                 </div>
-                                                <p className="mb-4 text-xs text-gray-500">
+                                                <p className="mt-4 mb-4 text-xs text-gray-500">
                                                     Created by: {rating.chiefUser?.firstName} {rating.chiefUser?.lastName}
                                                 </p>
                                                 <Button className="w-full cursor-pointer rounded-lg bg-primary py-2 font-bold text-gray-900">

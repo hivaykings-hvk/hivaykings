@@ -13,6 +13,7 @@ class ChiefRoadRating extends Model
 
     protected $fillable = [
         'road_rating_id',
+        'user_id',
         'road_condition',
         'traffic',
         'facilities',
@@ -31,5 +32,10 @@ class ChiefRoadRating extends Model
     public function roadRating(): BelongsTo
     {
         return $this->belongsTo(RoadRating::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

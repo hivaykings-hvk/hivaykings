@@ -32,6 +32,11 @@ class RoadRating extends Model
         return $this->hasMany(ChiefRoadRating::class);
     }
 
+    public function chiefRatings(): HasMany
+    {
+        return $this->hasMany(ChiefRoadRating::class);
+    }
+
     public function userRatings(): HasMany
     {
         return $this->hasMany(UserRoadRating::class);
