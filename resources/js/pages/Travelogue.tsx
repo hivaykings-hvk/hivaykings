@@ -184,14 +184,14 @@ function TraveloguePageContent() {
                                 <span className="mr-2 text-xl">+</span> Create a Story
                             </Link>
                         </Button>
-                        <Button
+                        {/* <Button
                             variant="outline"
                             className="rounded-full border-2 border-primary bg-transparent px-6 py-3 text-lg text-primary hover:bg-primary hover:text-gray-800"
                         >
                             <Link href="/travelogue" className="flex items-center">
                                 Explore Stories
                             </Link>
-                        </Button>
+                        </Button> */}
                     </div>
                 </div>
             </div>

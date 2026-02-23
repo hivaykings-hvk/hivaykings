@@ -11,7 +11,7 @@ const Footer = () => {
                     {/* Logo and Description */}
                     <div className="flex flex-col items-center lg:items-start">
                         <Link href="/" className="mb-4 flex items-center gap-2">
-                            <div className="rounded-lg border-2 border-white bg-primary px-3 py-1 text-gray-800">HVK</div>
+                            <img src="/logo.png" alt="HiVayKings Logo" className="h-12 w-auto md:h-14 lg:h-16" />
                             <div className="text-xl font-semibold text-primary">HiVayKings</div>
                         </Link>
                         <p className="text-sm text-gray-300">Where travelers meet, routes are discovered, and journeys are shared.</p>

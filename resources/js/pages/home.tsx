@@ -329,7 +329,7 @@ function Home() {
             {/* Live Highway & Route Ratings End */}
 
             {/* Live Road Updates */}
-            <div className="bg-grayishBg pt-10 pb-16">
+            <div className="bg-grayishBg px-3 pt-10 pb-16">
                 <div className="mx-auto max-w-6xl">
                     <h2 className="mb-12 text-center text-2xl font-normal text-gray-800">About HVK</h2>
                     <div className="flex flex-col items-start gap-8 md:flex-row">

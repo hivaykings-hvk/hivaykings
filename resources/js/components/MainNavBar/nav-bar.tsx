@@ -108,16 +108,16 @@ const NavBar = () => {
 
     return (
         <FixedNavBarWrapper>
-            <nav className="container mx-auto flex items-center justify-between px-3 py-4">
+            <nav className="container mx-auto flex items-center justify-between px-3">
                 {/* Logo Section */}
                 <a href="/" className="z-50 flex items-center gap-2">
                     {/* <div className="rounded-lg border-2 border-white bg-primary px-3 py-1 text-gray-800">HVK</div>
                     <div className="text-primary">HiVayKings</div> */}
-                    <img src="/logo.png" alt="HiVayKings Logo" className="h-8 w-auto" />
+                    <img src="/logo.png" alt="HiVayKings Logo" className="h-12 w-auto md:h-14 lg:h-16" />
                 </a>
 
                 {/* Navigation Links */}
-                <div className="hidden items-center space-x-8 lg:flex">
+                <div className="hidden items-center space-x-8 py-4 lg:flex">
                     <ActiveLink href="/">Home</ActiveLink>
                     <ActiveLink href="/hvk-chowk">HVK Chowk</ActiveLink>
                     <ActiveLink href="/hvk-store">HVK Store</ActiveLink>
@@ -126,7 +126,7 @@ const NavBar = () => {
                 </div>
 
                 {/* Auth Buttons */}
-                <div className="hidden items-center gap-2 lg:flex">
+                <div className="hidden items-center gap-2 py-4 lg:flex">
                     {isAuthenticated && user ? (
                         <DropdownMenu>
                             <DropdownMenuTrigger>
@@ -198,7 +198,7 @@ const NavBar = () => {
                         </>
                     )}
                 </div>
-                <div className="inline-flex items-center gap-4 lg:hidden">
+                <div className="inline-flex items-center gap-4 py-4 lg:hidden">
                     {isAuthenticated && user && (
                         <MobileUserProfileButton imageUrl={user.image} firstName={user.firstName} lastName={user.lastName} className="z-60" />
                     )}
