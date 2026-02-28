@@ -106,15 +106,15 @@ jobs:
             mkdir -p "$DEPLOY_PATH"
             echo "[${{ steps.env.outputs.environment }}] Deployment directory created: $DEPLOY_PATH"
 
+      - name: Install SSH tools
+        run: |
+          apt-get update
+          apt-get install -y sshpass
+
       - name: Upload Files via SCP
-        uses: appleboy/scp-action@v0.1.4
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          port: ${{ secrets.SSH_PORT }}
-          username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
-          source: './deploy_package.zip'
-          target: '${{ steps.env.outputs.deploy_path }}/${{ steps.deploy_dir.outputs.dir_name }}/'
+        run: |
+          DEPLOY_PATH="${{ steps.env.outputs.deploy_path }}/${{ steps.deploy_dir.outputs.dir_name }}"
+          sshpass -p "${{ secrets.SSH_PASSWORD }}" scp -P ${{ secrets.SSH_PORT }} -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null ./deploy_package.zip ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:"${DEPLOY_PATH}/"
 
       - name: Extract and Setup on Server
         uses: appleboy/ssh-action@v1.0.3
