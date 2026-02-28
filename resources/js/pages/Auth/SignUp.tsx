@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Combobox, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList, ComboboxPopup } from '@/components/ui/combobox';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
-import RootLayout from '@/Layouts/RootLayout';
+import RootLayout from '@/layouts/RootLayout';
 import { signupFormSchema, SignupFormSchema } from '@/types/auth-schemas';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';

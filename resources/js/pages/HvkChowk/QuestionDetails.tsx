@@ -5,7 +5,7 @@ import RootReplyForm from '@/components/HvkChowk/question-details/root-reply-for
 import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
 import Link from '@/components/Link';
 import UserAvatar from '@/components/UserAvatar';
-import RootLayout from '@/Layouts/RootLayout';
+import RootLayout from '@/layouts/RootLayout';
 import { timeAgo } from '@/lib/time-functions';
 import { titleColorMap } from '@/lib/title-color-map';
 import { User } from '@/types';

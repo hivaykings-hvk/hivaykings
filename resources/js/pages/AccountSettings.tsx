@@ -1,5 +1,5 @@
 import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
-import RootLayout from '@/Layouts/RootLayout';
+import RootLayout from '@/layouts/RootLayout';
 import axios from 'axios';
 import { useEffect, useState } from 'react';
 import { CgSpinner } from 'react-icons/cg';

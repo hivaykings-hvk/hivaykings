@@ -3,7 +3,7 @@ import LeftSidebarDesktop from '@/components/HvkChowk/LeftSidebarDesktop';
 import LeftSidebarMobile from '@/components/HvkChowk/LeftSidebarMobile';
 import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
 import SearchBar from '@/components/HvkChowk/SearchBar';
-import RootLayout from '@/Layouts/RootLayout';
+import RootLayout from '@/layouts/RootLayout';
 import { User } from '@/types';
 import { Head, Link } from '@inertiajs/react';
 

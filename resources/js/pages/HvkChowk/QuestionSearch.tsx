@@ -5,7 +5,7 @@ import AskHvkCard from '@/components/HvkChowk/ask-hvk-card';
 import FilterComponent from '@/components/HvkChowk/filter-component';
 import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
 import LoadingSpinner from '@/components/spinner';
-import RootLayout from '@/Layouts/RootLayout';
+import RootLayout from '@/layouts/RootLayout';
 import { getProcessedDescription } from '@/lib/html-truncate-util';
 import { ChiefReply, RoadRating, SearchResponse } from '@/types/search';
 import { Head, usePage } from '@inertiajs/react';

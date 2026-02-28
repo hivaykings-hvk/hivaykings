@@ -4,7 +4,7 @@ import hvkPhoto from '@/assets/images/about-us/hvk-image.jpg';
 import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
 import Link from '@/components/Link';
 import UserAvatar from '@/components/UserAvatar';
-import RootLayout from '@/Layouts/RootLayout';
+import RootLayout from '@/layouts/RootLayout';
 import { timeAgo } from '@/lib/time-functions';
 import { usePage } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';

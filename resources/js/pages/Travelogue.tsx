@@ -6,7 +6,7 @@ import Link from '@/components/Link';
 import LoadingSpinner from '@/components/spinner';
 import { Button } from '@/components/ui/button';
 import UserAvatar from '@/components/UserAvatar';
-import RootLayout from '@/Layouts/RootLayout';
+import RootLayout from '@/layouts/RootLayout';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useEffect, useRef } from 'react';

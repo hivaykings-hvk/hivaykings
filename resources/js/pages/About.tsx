@@ -7,7 +7,7 @@ import image3 from '@/assets/images/about-us/photo-gallery/image-3.png';
 import image4 from '@/assets/images/about-us/photo-gallery/image-4.png';
 import image5 from '@/assets/images/about-us/photo-gallery/image-5.png';
 import image6 from '@/assets/images/about-us/photo-gallery/image-6.png';
-import RootLayout from '@/Layouts/RootLayout';
+import RootLayout from '@/layouts/RootLayout';
 import {
     FaAward,
     FaBook,

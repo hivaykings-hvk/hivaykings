@@ -5,7 +5,7 @@ import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
 import LoadingSpinner from '@/components/spinner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import RootLayout from '@/Layouts/RootLayout';
+import RootLayout from '@/layouts/RootLayout';
 import { Link } from '@inertiajs/react';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';

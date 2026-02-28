@@ -9,7 +9,7 @@ import hvkMaps from '@/assets/images/store-images/product/hvk-maps.png';
 import hvkMug from '@/assets/images/store-images/product/hvk-mug.png';
 import hvkTshirt from '@/assets/images/store-images/product/hvk-tshirt.png';
 import storeHero from '@/assets/images/store-images/store-hero.png';
-import RootLayout from '@/Layouts/RootLayout';
+import RootLayout from '@/layouts/RootLayout';
 import {
     FaCalendarCheck,
     FaCloudRain,

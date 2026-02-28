@@ -9,7 +9,7 @@ import ReviewList from '@/components/HvkChowk/road-rating-details/review-list';
 import RoadRatingInputForm from '@/components/HvkChowk/road-rating-input-form';
 import LoadingSpinner from '@/components/spinner';
 import { Button } from '@/components/ui/button';
-import RootLayout from '@/Layouts/RootLayout';
+import RootLayout from '@/layouts/RootLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { Link, usePage } from '@inertiajs/react';
 import { useQuery } from '@tanstack/react-query';
