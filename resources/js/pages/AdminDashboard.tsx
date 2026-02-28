@@ -1,4 +1,4 @@
-import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
+import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
 import RootLayout from '@/Layouts/RootLayout';
 import { useEffect, useState } from 'react';
 import { CgSpinner } from 'react-icons/cg';

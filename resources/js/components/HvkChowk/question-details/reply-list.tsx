@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/Components/ui/button';
+import { Button } from '@/components/ui/button';
 import { User } from '@/types';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';

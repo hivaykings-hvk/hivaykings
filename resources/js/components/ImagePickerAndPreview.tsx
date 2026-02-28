@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/Components/ui/button';
+import { Button } from '@/components/ui/button';
 import { useFileUpload } from '@/hooks/use-file-upload';
 import { XIcon } from 'lucide-react';
 import { useEffect } from 'react';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/Components/ui/tabs';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Suspense, useState } from 'react';
 import { FaQuestionCircle } from 'react-icons/fa';
 import { HiPencilSquare } from 'react-icons/hi2';

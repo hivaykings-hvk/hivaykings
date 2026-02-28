@@ -1,6 +1,6 @@
 'use client';
 
-import UserAvatar from '@/Components/UserAvatar';
+import UserAvatar from '@/components/UserAvatar';
 import { timeAgo } from '@/lib/time-functions';
 import { titleColorMap } from '@/lib/title-color-map';
 import { User } from '@/types';

@@ -1,8 +1,8 @@
 'use client';
 
-import RichTextEditor from '@/Components/RichTextEditor';
+import RichTextEditor from '@/components/RichTextEditor';
 import { Form, FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form';
-import UserAvatar from '@/Components/UserAvatar';
+import UserAvatar from '@/components/UserAvatar';
 import { User } from '@/types';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation, useQueryClient } from '@tanstack/react-query';

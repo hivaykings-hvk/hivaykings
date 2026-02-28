@@ -1,4 +1,4 @@
-import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
+import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
 import RootLayout from '@/Layouts/RootLayout';
 import axios from 'axios';
 import { useEffect, useState } from 'react';

@@ -1,10 +1,10 @@
 'use client';
 
-import Link from '@/Components/Link';
-import { Button } from '@/Components/ui/button';
-import { Checkbox } from '@/Components/ui/checkbox';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
-import { Input } from '@/Components/ui/input';
+import Link from '@/components/Link';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import RootLayout from '@/Layouts/RootLayout';
 import { signInFormSchema, SignInFormSchema } from '@/types/auth-schemas';
 import { zodResolver } from '@hookform/resolvers/zod';

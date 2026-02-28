@@ -1,4 +1,4 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/Components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Editor } from '@tiptap/react';
 import { FaCalendarDay, FaIcons, FaImages, FaLocationDot, FaRoute, FaVideo } from 'react-icons/fa6';
 

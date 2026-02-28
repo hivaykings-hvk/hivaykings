@@ -1,10 +1,10 @@
 'use client';
 
 import roadRatingHeroImage from '@/assets/images/road-ratings/road-ratings-hero.png';
-import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
-import LoadingSpinner from '@/Components/spinner';
-import { Button } from '@/Components/ui/button';
-import { Input } from '@/Components/ui/input';
+import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
+import LoadingSpinner from '@/components/spinner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import RootLayout from '@/Layouts/RootLayout';
 import { Link } from '@inertiajs/react';
 import { useInfiniteQuery } from '@tanstack/react-query';

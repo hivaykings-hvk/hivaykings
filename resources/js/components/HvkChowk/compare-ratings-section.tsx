@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Star } from 'lucide-react';
 import React from 'react';
 import { FaCircleInfo, FaRegCircleQuestion, FaUsers } from 'react-icons/fa6';

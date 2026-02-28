@@ -1,12 +1,12 @@
 'use client';
 
-import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
-import { TravelogueCommentProvider } from '@/Components/HvkChowk/travelogue-comments/travelogue-comment-context';
-import TravelogueCommentForm from '@/Components/HvkChowk/travelogue-comments/travelogue-comment-form';
-import TravelogueCommentList from '@/Components/HvkChowk/travelogue-comments/travelogue-comment-list';
-import LoadingSpinner from '@/Components/spinner';
-import { Button } from '@/Components/ui/button';
-import UserAvatar from '@/Components/UserAvatar';
+import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
+import { TravelogueCommentProvider } from '@/components/HvkChowk/travelogue-comments/travelogue-comment-context';
+import TravelogueCommentForm from '@/components/HvkChowk/travelogue-comments/travelogue-comment-form';
+import TravelogueCommentList from '@/components/HvkChowk/travelogue-comments/travelogue-comment-list';
+import LoadingSpinner from '@/components/spinner';
+import { Button } from '@/components/ui/button';
+import UserAvatar from '@/components/UserAvatar';
 import { useAuth } from '@/hooks/useAuth';
 import RootLayout from '@/Layouts/RootLayout';
 import { Link, usePage } from '@inertiajs/react';

@@ -1,11 +1,11 @@
 'use client';
 
-import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
-import ImagePickerWithPreview from '@/Components/image-picker-with-preview';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
-import { Input } from '@/Components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/Components/ui/select';
-import { Textarea } from '@/Components/ui/textarea';
+import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
+import ImagePickerWithPreview from '@/components/image-picker-with-preview';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
 import RootLayout from '@/Layouts/RootLayout';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from '@inertiajs/react';

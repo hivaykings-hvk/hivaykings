@@ -1,12 +1,12 @@
 'use client';
 
-import ImagePickerAndPreview from '@/Components/ImagePickerAndPreview';
-import Link from '@/Components/Link';
-import { Button } from '@/Components/ui/button';
-import { Checkbox } from '@/Components/ui/checkbox';
-import { Combobox, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList, ComboboxPopup } from '@/Components/ui/combobox';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
-import { Input } from '@/Components/ui/input';
+import ImagePickerAndPreview from '@/components/ImagePickerAndPreview';
+import Link from '@/components/Link';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Combobox, ComboboxEmpty, ComboboxInput, ComboboxItem, ComboboxList, ComboboxPopup } from '@/components/ui/combobox';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import RootLayout from '@/Layouts/RootLayout';
 import { signupFormSchema, SignupFormSchema } from '@/types/auth-schemas';
 import { zodResolver } from '@hookform/resolvers/zod';

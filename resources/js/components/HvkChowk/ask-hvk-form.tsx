@@ -1,6 +1,6 @@
 'use client';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
-import { Input } from '@/Components/ui/input';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import { QuestionWithUser } from '@/types/question';
 import { AskHvkFormSchema } from '@/zod-schema/ask-hvk-schema';
 import { zodResolver } from '@hookform/resolvers/zod';

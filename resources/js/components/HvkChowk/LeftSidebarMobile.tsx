@@ -1,5 +1,5 @@
-import { ScrollArea } from '@/Components/ui/scroll-area';
-import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/Components/ui/sheet';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTrigger } from '@/components/ui/sheet';
 import { FaHeart, FaRegComment } from 'react-icons/fa6';
 
 const LeftSidebarMobile = () => {

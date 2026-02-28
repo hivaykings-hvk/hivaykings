@@ -1,11 +1,11 @@
 'use client';
 
 import heroImage from '@/assets/images/hero.png';
-import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
-import Link from '@/Components/Link';
-import LoadingSpinner from '@/Components/spinner';
-import { Button } from '@/Components/ui/button';
-import UserAvatar from '@/Components/UserAvatar';
+import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
+import Link from '@/components/Link';
+import LoadingSpinner from '@/components/spinner';
+import { Button } from '@/components/ui/button';
+import UserAvatar from '@/components/UserAvatar';
 import RootLayout from '@/Layouts/RootLayout';
 import { useInfiniteQuery } from '@tanstack/react-query';
 import axios from 'axios';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/Components/ui/dialog';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import clsx from 'clsx';
 import { ReactNode, useEffect, useState } from 'react';
 import { BsXCircle } from 'react-icons/bs';

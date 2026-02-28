@@ -1,8 +1,8 @@
-import HvkChowkTabs from '@/Components/HvkChowk/hvk-chowk-tabs';
-import LeftSidebarDesktop from '@/Components/HvkChowk/LeftSidebarDesktop';
-import LeftSidebarMobile from '@/Components/HvkChowk/LeftSidebarMobile';
-import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
-import SearchBar from '@/Components/HvkChowk/SearchBar';
+import HvkChowkTabs from '@/components/HvkChowk/hvk-chowk-tabs';
+import LeftSidebarDesktop from '@/components/HvkChowk/LeftSidebarDesktop';
+import LeftSidebarMobile from '@/components/HvkChowk/LeftSidebarMobile';
+import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
+import SearchBar from '@/components/HvkChowk/SearchBar';
 import RootLayout from '@/Layouts/RootLayout';
 import { User } from '@/types';
 import { Head, Link } from '@inertiajs/react';

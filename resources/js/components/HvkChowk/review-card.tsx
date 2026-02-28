@@ -1,4 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from '@/Components/ui/avatar';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { timeAgo } from '@/lib/time-functions';
 import { titleColorMap } from '@/lib/title-color-map';
 import parse from 'html-react-parser';

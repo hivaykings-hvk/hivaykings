@@ -1,5 +1,5 @@
-import Footer from '@/Components/footer/main-footer';
-import NavBar from '@/Components/MainNavBar/nav-bar';
+import Footer from '@/components/footer/main-footer';
+import NavBar from '@/components/MainNavBar/nav-bar';
 import React from 'react';
 import { Toaster } from 'sonner';
 

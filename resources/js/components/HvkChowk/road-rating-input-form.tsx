@@ -1,6 +1,6 @@
 'use client';
 
-import RichTextEditor from '@/Components/RichTextEditor';
+import RichTextEditor from '@/components/RichTextEditor';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
 import { Plus, Star } from 'lucide-react';

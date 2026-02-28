@@ -1,10 +1,10 @@
 'use client';
 
-import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
-import RichTextEditor from '@/Components/RichTextEditor';
-import { Button } from '@/Components/ui/button';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/Components/ui/form';
-import { Input } from '@/Components/ui/input';
+import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
+import RichTextEditor from '@/components/RichTextEditor';
+import { Button } from '@/components/ui/button';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Input } from '@/components/ui/input';
 import RootLayout from '@/Layouts/RootLayout';
 import { zodResolver } from '@hookform/resolvers/zod';
 import axios from 'axios';

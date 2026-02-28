@@ -1,10 +1,10 @@
 'use client';
 
-import SearchBar from '@/Components/HvkChowk/SearchBar';
-import AskHvkCard from '@/Components/HvkChowk/ask-hvk-card';
-import FilterComponent from '@/Components/HvkChowk/filter-component';
-import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
-import LoadingSpinner from '@/Components/spinner';
+import SearchBar from '@/components/HvkChowk/SearchBar';
+import AskHvkCard from '@/components/HvkChowk/ask-hvk-card';
+import FilterComponent from '@/components/HvkChowk/filter-component';
+import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
+import LoadingSpinner from '@/components/spinner';
 import RootLayout from '@/Layouts/RootLayout';
 import { getProcessedDescription } from '@/lib/html-truncate-util';
 import { ChiefReply, RoadRating, SearchResponse } from '@/types/search';

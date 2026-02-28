@@ -1,14 +1,14 @@
 'use client';
 
-import AdditionalInfoSection from '@/Components/HvkChowk/additional-info-section';
-import CompareRatingsSection from '@/Components/HvkChowk/compare-ratings-section';
-import { ReactQueryProvider } from '@/Components/HvkChowk/react-query-provider';
-import ReviewForm from '@/Components/HvkChowk/road-rating-details/review-form';
-import { ReviewFormProvider } from '@/Components/HvkChowk/road-rating-details/review-form-context';
-import ReviewList from '@/Components/HvkChowk/road-rating-details/review-list';
-import RoadRatingInputForm from '@/Components/HvkChowk/road-rating-input-form';
-import LoadingSpinner from '@/Components/spinner';
-import { Button } from '@/Components/ui/button';
+import AdditionalInfoSection from '@/components/HvkChowk/additional-info-section';
+import CompareRatingsSection from '@/components/HvkChowk/compare-ratings-section';
+import { ReactQueryProvider } from '@/components/HvkChowk/react-query-provider';
+import ReviewForm from '@/components/HvkChowk/road-rating-details/review-form';
+import { ReviewFormProvider } from '@/components/HvkChowk/road-rating-details/review-form-context';
+import ReviewList from '@/components/HvkChowk/road-rating-details/review-list';
+import RoadRatingInputForm from '@/components/HvkChowk/road-rating-input-form';
+import LoadingSpinner from '@/components/spinner';
+import { Button } from '@/components/ui/button';
 import RootLayout from '@/Layouts/RootLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { Link, usePage } from '@inertiajs/react';
