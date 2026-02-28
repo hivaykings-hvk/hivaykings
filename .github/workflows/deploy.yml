@@ -192,7 +192,7 @@ jobs:
           echo "  - deploy_package/.env"
 
           echo "Uploading to: ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:$DEPLOY_PATH/"
-          scp -p ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts -v ./deploy_package.zip ./deploy_package/.env ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:"$DEPLOY_PATH/" 2>&1 | grep -E "(upload|sent|received|ERROR|error)" | tail -20
+          scp -P ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts -v ./deploy_package.zip ./deploy_package/.env ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:"$DEPLOY_PATH/" 2>&1 | grep -E "(upload|sent|received|ERROR|error)" | tail -20
 
           if [ $? -eq 0 ]; then
             echo "✓ Files uploaded successfully"
@@ -239,7 +239,7 @@ jobs:
             mv deploy_package/* .
 
             # Remove the extracted directory and zip file
-            rmdir deploy_package
+            #rmdir deploy_package
             #rm deploy_package.zip
 
             echo "✓ [${{ steps.env.outputs.environment }}] Archive extracted and files organized"
