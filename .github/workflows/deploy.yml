@@ -107,7 +107,7 @@ jobs:
             echo "[${{ steps.env.outputs.environment }}] Deployment directory created: $DEPLOY_PATH"
 
       - name: Upload Files via SFTP
-        uses: wangyoucao577/sftp-upload-action@v1.4.8
+        uses: wangyucode/sftp-upload-action@v3
         with:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
