@@ -29,6 +29,10 @@ jobs:
             echo "deploy_path=${{ secrets.PROD_DEPLOY_PATH }}" >> $GITHUB_OUTPUT
           fi
 
+          # Debug output
+          echo "DEBUG: Environment = dev"
+          echo "DEBUG: Deploy path secret = ${{ secrets.DEV_DEPLOY_PATH }}"
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -102,9 +106,27 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            DEPLOY_PATH="${{ steps.env.outputs.deploy_path }}/${{ steps.deploy_dir.outputs.dir_name }}"
+            BASE_PATH="${{ secrets.DEV_DEPLOY_PATH }}"
+            DIR_NAME="${{ steps.deploy_dir.outputs.dir_name }}"
+            DEPLOY_PATH="$BASE_PATH/$DIR_NAME"
+
+            echo "DEBUG: Base path: $BASE_PATH"
+            echo "DEBUG: Dir name: $DIR_NAME"
+            echo "DEBUG: Full path: $DEPLOY_PATH"
+
+            if [ -z "$BASE_PATH" ]; then
+              echo "ERROR: DEV_DEPLOY_PATH secret is not set!"
+              exit 1
+            fi
+
             mkdir -p "$DEPLOY_PATH"
-            echo "[${{ steps.env.outputs.environment }}] Deployment directory created: $DEPLOY_PATH"
+            if [ $? -eq 0 ]; then
+              echo "✓ [${{ steps.env.outputs.environment }}] Deployment directory created: $DEPLOY_PATH"
+              ls -la "$DEPLOY_PATH"
+            else
+              echo "ERROR: Failed to create deployment directory: $DEPLOY_PATH"
+              exit 1
+            fi
 
       - name: Setup SSH Key
         run: |
@@ -115,18 +137,27 @@ jobs:
 
       - name: Upload Files via SCP
         run: |
-          DEPLOY_PATH="${{ steps.env.outputs.deploy_path }}/${{ steps.deploy_dir.outputs.dir_name }}"
-          echo "DEBUG: Full deploy path: $DEPLOY_PATH"
-          echo "DEBUG: Deploy base path: ${{ steps.env.outputs.deploy_path }}"
-          echo "DEBUG: Deploy dir name: ${{ steps.deploy_dir.outputs.dir_name }}"
+          BASE_PATH="${{ secrets.DEV_DEPLOY_PATH }}"
+          DIR_NAME="${{ steps.deploy_dir.outputs.dir_name }}"
+          DEPLOY_PATH="$BASE_PATH/$DIR_NAME"
 
-          if [ -z "$DEPLOY_PATH" ] || [ "$DEPLOY_PATH" == "/" ]; then
+          echo "DEBUG: Full deploy path: $DEPLOY_PATH"
+          echo "DEBUG: Deploy base path: $BASE_PATH"
+          echo "DEBUG: Deploy dir name: $DIR_NAME"
+
+          if [ -z "$BASE_PATH" ] || [ "$BASE_PATH" = "/" ]; then
             echo "ERROR: Deploy path is empty or invalid!"
             exit 1
           fi
 
+          if [ ! -f "./deploy_package.zip" ]; then
+            echo "ERROR: deploy_package.zip not found!"
+            ls -la
+            exit 1
+          fi
+
           echo "Uploading to: ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:$DEPLOY_PATH/"
-          scp -p ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts -v ./deploy_package.zip ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:"$DEPLOY_PATH/" 2>&1 | head -50
+          scp -P ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts -v ./deploy_package.zip ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:"$DEPLOY_PATH/" 2>&1 | tail -20
 
       - name: Extract and Setup on Server
         uses: appleboy/ssh-action@v1.0.3
@@ -136,13 +167,33 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            DEPLOY_PATH="${{ steps.env.outputs.deploy_path }}/${{ steps.deploy_dir.outputs.dir_name }}"
+            BASE_PATH="${{ secrets.DEV_DEPLOY_PATH }}"
+            DIR_NAME="${{ steps.deploy_dir.outputs.dir_name }}"
+            DEPLOY_PATH="$BASE_PATH/$DIR_NAME"
+
+            echo "DEBUG: Extracting from: $DEPLOY_PATH"
+
+            # Verify directory exists
+            if [ ! -d "$DEPLOY_PATH" ]; then
+              echo "ERROR: Deployment directory does not exist: $DEPLOY_PATH"
+              exit 1
+            fi
+
+            # Verify zip file exists
+            if [ ! -f "$DEPLOY_PATH/deploy_package.zip" ]; then
+              echo "ERROR: Deploy package zip not found at: $DEPLOY_PATH/deploy_package.zip"
+              ls -la "$DEPLOY_PATH"
+              exit 1
+            fi
+
             cd "$DEPLOY_PATH"
 
             # Extract the zip file
+            echo "Extracting zip file..."
             unzip -q deploy_package.zip
 
             # Move contents from deploy_package to current directory
+            echo "Organizing files..."
             mv deploy_package/* .
 
             # Remove the extracted directory and zip file
@@ -159,7 +210,10 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
-            DEPLOY_PATH="${{ steps.env.outputs.deploy_path }}/${{ steps.deploy_dir.outputs.dir_name }}"
+            BASE_PATH="${{ secrets.DEV_DEPLOY_PATH }}"
+            DIR_NAME="${{ steps.deploy_dir.outputs.dir_name }}"
+            DEPLOY_PATH="$BASE_PATH/$DIR_NAME"
+
             cd "$DEPLOY_PATH"
 
             # Verify .env exists
