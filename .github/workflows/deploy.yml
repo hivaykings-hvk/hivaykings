@@ -67,6 +67,9 @@ jobs:
           ENVIRONMENT: ${{ steps.env.outputs.environment }}
         run: |
           mkdir -p deploy_package
+          echo "Preparing deployment package for environment: $ENVIRONMENT"
+
+          # Copy directories
           cp -r app/ deploy_package/
           cp -r bootstrap/ deploy_package/
           cp -r config/ deploy_package/
@@ -76,7 +79,32 @@ jobs:
           cp -r routes/ deploy_package/
           cp -r storage/ deploy_package/
           cp -r vendor/ deploy_package/
-          cp .env.dev deploy_package/.env
+
+          # Copy environment-specific .env file with proper error handling
+          ENV_FILE=".env.${ENVIRONMENT}"
+          if [ -f "$ENV_FILE" ]; then
+            echo "✓ Copying environment file: $ENV_FILE"
+            cp "$ENV_FILE" deploy_package/.env
+          elif [ -f ".env.example" ]; then
+            echo "⚠ Environment file not found: $ENV_FILE"
+            echo "⚠ Using fallback: .env.example"
+            cp .env.example deploy_package/.env
+          else
+            echo "ERROR: No environment file found!"
+            echo "  Expected: $ENV_FILE"
+            echo "  Fallback: .env.example"
+            ls -la .env* 2>/dev/null || echo "No .env files found"
+            exit 1
+          fi
+
+          # Verify .env was copied
+          if [ ! -f "deploy_package/.env" ]; then
+            echo "ERROR: Failed to copy .env file to deploy_package"
+            exit 1
+          fi
+          echo "✓ .env file successfully copied to deploy_package/"
+
+          # Copy configuration and other files
           cp artisan deploy_package/
           cp composer.json deploy_package/
           cp composer.lock deploy_package/
@@ -86,6 +114,10 @@ jobs:
           cp vite.config.ts deploy_package/
           cp phpunit.xml deploy_package/
           cp eslint.config.js deploy_package/
+
+          echo "✓ All deployment files prepared successfully"
+          echo "Deployment package contents:"
+          ls -la deploy_package/ | head -20
 
       - name: Create Deployment Archive
         run: |
