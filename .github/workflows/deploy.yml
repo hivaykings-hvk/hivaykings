@@ -1,0 +1,141 @@
+name: Deploy to Hostinger
+
+on:
+  push:
+    branches:
+      - develop
+      - staging
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Determine Environment
+        id: env
+        run: |
+          if [ "${{ github.ref }}" = "refs/heads/develop" ]; then
+            echo "environment=dev" >> $GITHUB_OUTPUT
+            echo "deploy_path=${{ secrets.DEV_DEPLOY_PATH }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/staging" ]; then
+            echo "environment=test" >> $GITHUB_OUTPUT
+            echo "deploy_path=${{ secrets.TEST_DEPLOY_PATH }}" >> $GITHUB_OUTPUT
+          elif [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            echo "environment=prod" >> $GITHUB_OUTPUT
+            echo "deploy_path=${{ secrets.PROD_DEPLOY_PATH }}" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: 8.4
+          tools: composer:v2
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install Node Dependencies
+        run: npm ci
+
+      - name: Install PHP Dependencies
+        run: composer install --no-interaction --prefer-dist --optimize-autoloader --no-dev
+
+      - name: Build Assets
+        run: npm run build
+
+      - name: Get Short Commit Hash
+        id: commit
+        run: echo "short_hash=$(git rev-parse --short HEAD)" >> $GITHUB_OUTPUT
+
+      - name: Create Deployment Directory Name
+        id: deploy_dir
+        run: echo "dir_name=${{ steps.commit.outputs.short_hash }}-$(date +%s)" >> $GITHUB_OUTPUT
+
+      - name: Prepare Deployment Files
+        env:
+          ENVIRONMENT: ${{ steps.env.outputs.environment }}
+        run: |
+          mkdir -p deploy_package
+          cp -r app/ deploy_package/
+          cp -r bootstrap/ deploy_package/
+          cp -r config/ deploy_package/
+          cp -r database/ deploy_package/
+          cp -r public/ deploy_package/
+          cp -r resources/ deploy_package/
+          cp -r routes/ deploy_package/
+          cp -r storage/ deploy_package/
+          cp -r vendor/ deploy_package/
+
+          # Copy environment-specific .env file
+          if [ -f ".env.${ENVIRONMENT}" ]; then
+            cp ".env.${ENVIRONMENT}" deploy_package/.env
+          else
+            cp .env.example deploy_package/.env
+          fi
+
+          cp artisan deploy_package/
+          cp composer.json deploy_package/
+          cp composer.lock deploy_package/
+          cp package.json deploy_package/
+          cp package-lock.json deploy_package/
+          cp tsconfig.json deploy_package/
+          cp vite.config.ts deploy_package/
+          cp phpunit.xml deploy_package/
+          cp eslint.config.js deploy_package/
+
+      - name: Create Deployment Archive
+        run: |
+          zip -r deploy_package.zip deploy_package/
+
+      - name: Create Deployment Directory on Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            DEPLOY_PATH="${{ steps.env.outputs.deploy_path }}/${{ steps.deploy_dir.outputs.dir_name }}"
+            mkdir -p "$DEPLOY_PATH"
+            echo "[${{ steps.env.outputs.environment }}] Deployment directory created: $DEPLOY_PATH"
+
+      - name: Upload Files via SFTP
+        uses: wangyoucao577/sftp-upload-action@v1.4.8
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          local_path: './deploy_package.zip'
+          remote_path: '${{ steps.env.outputs.deploy_path }}/${{ steps.deploy_dir.outputs.dir_name }}'
+          delete: 'false'
+
+      - name: Extract and Setup on Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          password: ${{ secrets.SSH_PASSWORD }}
+          script: |
+            DEPLOY_PATH="${{ steps.env.outputs.deploy_path }}/${{ steps.deploy_dir.outputs.dir_name }}"
+            cd "$DEPLOY_PATH"
+
+            # Extract the zip file
+            unzip -q deploy_package.zip
+
+            # Move contents from deploy_package to current directory
+            # mv deploy_package/* .
+
+            # Remove the extracted directory and zip file
+            # rmdir deploy_package
+            # rm deploy_package.zip
+
+            echo "✓ [${{ steps.env.outputs.environment }}] Archive extracted and files organized"
