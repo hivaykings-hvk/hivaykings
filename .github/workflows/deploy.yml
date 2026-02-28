@@ -76,14 +76,7 @@ jobs:
           cp -r routes/ deploy_package/
           cp -r storage/ deploy_package/
           cp -r vendor/ deploy_package/
-
-          # Copy environment-specific .env file
-          if [ -f ".env.${ENVIRONMENT}" ]; then
-            cp ".env.${ENVIRONMENT}" deploy_package/.env
-          else
-            cp .env.example deploy_package/.env
-          fi
-
+          cp .env.dev deploy_package/.env
           cp artisan deploy_package/
           cp composer.json deploy_package/
           cp composer.lock deploy_package/
@@ -213,8 +206,11 @@ jobs:
             BASE_PATH="${{ secrets.DEV_DEPLOY_PATH }}"
             DIR_NAME="${{ steps.deploy_dir.outputs.dir_name }}"
             DEPLOY_PATH="$BASE_PATH/$DIR_NAME"
+            echo "DEBUG: Running post-deployment tasks in: $DEPLOY_PATH"
 
+            cd ~
             cd "$DEPLOY_PATH"
+            echo "✓ [${{ steps.env.outputs.environment }}] Changed to deployment directory: $PWD"
 
             # Verify .env exists
             if [ ! -f .env ]; then
