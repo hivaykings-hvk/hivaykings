@@ -271,6 +271,9 @@ jobs:
             echo "✓ [${{ steps.env.outputs.environment }}] Application deployed to: $DEPLOY_PATH"
 
       - name: Post Deployment DB Migration
+        env:
+          ENVIRONMENT: ${{ steps.env.outputs.environment }}
         run: |
+          mv ".env.${ENVIRONMENT}" .env
           sed -i 's/DB_HOST=localhost/DB_HOST=82.25.121.183/g' .env
           php artisan migrate --force
