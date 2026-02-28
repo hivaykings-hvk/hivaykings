@@ -121,7 +121,7 @@ jobs:
 
       - name: Create Deployment Archive
         run: |
-          zip -q -r deploy_package.zip deploy_package/
+          zip --include-dotfiles -q -r deploy_package.zip deploy_package/
 
       - name: Create Deployment Directory on Server
         uses: appleboy/ssh-action@v1.0.3
