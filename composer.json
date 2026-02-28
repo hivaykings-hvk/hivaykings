@@ -1,6 +1,6 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/blank-react-starter-kit",
+    "name": "Hivaykings Laravel Inertia React Project",
     "type": "project",
     "description": "The skeleton application for the Laravel framework.",
     "keywords": [
