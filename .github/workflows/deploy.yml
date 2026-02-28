@@ -239,8 +239,8 @@ jobs:
             mv deploy_package/* .
 
             # Remove the extracted directory and zip file
-            #rmdir deploy_package
-            #rm deploy_package.zip
+            rmdir deploy_package
+            rm deploy_package.zip
 
             echo "✓ [${{ steps.env.outputs.environment }}] Archive extracted and files organized"
 
@@ -270,10 +270,38 @@ jobs:
             echo "✓ [${{ steps.env.outputs.environment }}] Deployment completed successfully!"
             echo "✓ [${{ steps.env.outputs.environment }}] Application deployed to: $DEPLOY_PATH"
 
-      - name: Post Deployment DB Migration
+      - name: Post Deployment - DB Migration
         env:
           ENVIRONMENT: ${{ steps.env.outputs.environment }}
         run: |
           mv ".env.${ENVIRONMENT}" .env
           sed -i 's/DB_HOST=localhost/DB_HOST=82.25.121.183/g' .env
           php artisan migrate --force
+
+      - name: Post Deployment Tasks - Configure Symlinks
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          port: ${{ secrets.SSH_PORT }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            BASE_PATH="${{ secrets.DEV_DEPLOY_PATH }}"
+            DIR_NAME="${{ steps.deploy_dir.outputs.dir_name }}"
+            DEPLOY_PATH="$BASE_PATH/$DIR_NAME"
+            echo "DEBUG: Running post-deployment tasks in: $DEPLOY_PATH"
+
+            cd ~
+            SYMLINK_BASE_PATH="$PWD$DEPLOY_PATH"
+            # Replace ./ in base path with / to ensure correct absolute path for symlink
+            SYMLINK_BASE_PATH="${SYMLINK_BASE_PATH/.\//\/}"
+            echo "DEBUG: Symlink base path: $SYMLINK_BASE_PATH"
+
+            #cd "$DEPLOY_PATH"
+            #echo "✓ [${{ steps.env.outputs.environment }}] Changed to deployment directory: $DEPLOY_PATH"
+
+            ln -s "$SYMLINK_BASE_PATH/public" public_html
+            ln -s "$SYMLINK_BASE_PATH/storage/app/public" "$SYMLINK_BASE_PATH/public/storage"
+
+            echo "✓ [${{ steps.env.outputs.environment }}] Deployment completed successfully!"
+            echo "✓ [${{ steps.env.outputs.environment }}] Application deployed to: $DEPLOY_PATH"
