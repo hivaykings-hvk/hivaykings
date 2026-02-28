@@ -116,7 +116,17 @@ jobs:
       - name: Upload Files via SCP
         run: |
           DEPLOY_PATH="${{ steps.env.outputs.deploy_path }}/${{ steps.deploy_dir.outputs.dir_name }}"
-          scp -P ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts ./deploy_package.zip ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:"$DEPLOY_PATH/"
+          echo "DEBUG: Full deploy path: $DEPLOY_PATH"
+          echo "DEBUG: Deploy base path: ${{ steps.env.outputs.deploy_path }}"
+          echo "DEBUG: Deploy dir name: ${{ steps.deploy_dir.outputs.dir_name }}"
+
+          if [ -z "$DEPLOY_PATH" ] || [ "$DEPLOY_PATH" == "/" ]; then
+            echo "ERROR: Deploy path is empty or invalid!"
+            exit 1
+          fi
+
+          echo "Uploading to: ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:$DEPLOY_PATH/"
+          scp -p ${{ secrets.SSH_PORT }} -i ~/.ssh/deploy_key -o StrictHostKeyChecking=no -o UserKnownHostsFile=~/.ssh/known_hosts -v ./deploy_package.zip ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }}:"$DEPLOY_PATH/" 2>&1 | head -50
 
       - name: Extract and Setup on Server
         uses: appleboy/ssh-action@v1.0.3
