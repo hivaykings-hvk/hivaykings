@@ -122,7 +122,7 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
-          password: ${{ secrets.SSH_PASSWORD }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
           script: |
             DEPLOY_PATH="${{ steps.env.outputs.deploy_path }}/${{ steps.deploy_dir.outputs.dir_name }}"
             cd "$DEPLOY_PATH"
@@ -146,13 +146,14 @@ jobs:
           port: ${{ secrets.SSH_PORT }}
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
-          key: ${{ secrets.SSH_PRIVATE_KEY
+          script: |
             DEPLOY_PATH="${{ steps.env.outputs.deploy_path }}/${{ steps.deploy_dir.outputs.dir_name }}"
             cd "$DEPLOY_PATH"
 
-            # Create .env file from .env.development if it doesn't exist
+            # Verify .env exists
             if [ ! -f .env ]; then
-              cp .env .env
+              echo "Error: .env file not found after extraction"
+              exit 1
             fi
 
             # Generate application key if needed
