@@ -1,6 +1,5 @@
 {
     "$schema": "https://www.schemastore.org/package.json",
-    "name": "Hivaykings Laravel Inertia React Project",
     "private": true,
     "type": "module",
     "scripts": {
