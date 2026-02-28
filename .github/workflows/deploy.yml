@@ -267,23 +267,10 @@ jobs:
               exit 1
             fi
 
-            # Generate application key if needed
-            if ! grep -q "APP_KEY=" .env || grep -q "APP_KEY=$" .env; then
-              php artisan key:generate
-            fi
-
-            # Set proper permissions
-            chmod -R 755 bootstrap/ storage/
-            chmod -R 644 bootstrap/cache/ storage/
-
-            # Run migrations
-            php artisan migrate --force
-
-            # Cache clearing and optimization
-            php artisan config:cache
-            php artisan route:cache
-            php artisan view:cache
-            php artisan optimize
-
             echo "✓ [${{ steps.env.outputs.environment }}] Deployment completed successfully!"
             echo "✓ [${{ steps.env.outputs.environment }}] Application deployed to: $DEPLOY_PATH"
+
+      - name: Post Deployment DB Migration
+        run: |
+          sed -i 's/DB_HOST=localhost/DB_HOST=82.25.121.183/g' .env
+          php artisan migrate --force
