@@ -121,7 +121,7 @@ jobs:
 
       - name: Create Deployment Archive
         run: |
-          zip -q -r deploy_package.zip deploy_package/
+          zip -q -r deploy_package.zip deploy_package/* deploy_package/.env
 
       - name: Create Deployment Directory on Server
         uses: appleboy/ssh-action@v1.0.3
@@ -222,7 +222,7 @@ jobs:
             mv deploy_package/* .
 
             # Remove the extracted directory and zip file
-            #rmdir deploy_package
+            rmdir deploy_package
             #rm deploy_package.zip
 
             echo "✓ [${{ steps.env.outputs.environment }}] Archive extracted and files organized"
